@@ -1,34 +1,50 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    concat: {
-      dist: {
-        src: ['src/cube*.js'],
-        dest: 'build/<%= pkg.name %>-<%= pkg.version %>.js',
-      },
-      demo: {
-        src: ['src/demo*.js'],
-        dest: 'build/<%= pkg.name %>-<%= pkg.version %>-demo.js',
-      }
-    },
-    uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %>-<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-      },
-      dist: {
-        src: 'build/<%= pkg.name %>-<%= pkg.version %>.js',
-        dest: 'build/<%= pkg.name %>-<%= pkg.version %>.min.js'
-      },
-      demo: {
-        src: 'build/<%= pkg.name %>-<%= pkg.version %>-demo.js',
-        dest: 'build/<%= pkg.name %>-<%= pkg.version %>-demo.min.js'
-      }
-    }
-  });
+    grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+        rel: {
+            name:'<%= pkg.name %>-<%= pkg.version %>'
+        },
+        concat: {
+            pack: {
+                src: ['src/cube.js', 'src/cube-*.js'],
+                dest: 'build/<%= rel.name %>.js'
+            }
+        },
+        uglify: {
+            options: {
+                banner: '/*! <%= rel.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+            },
+            dist: {
+                src: 'build/<%= rel.name %>.js',
+                dest: 'build/<%= rel.name %>.min.js'
+            }
+        },
+        copy: {
+            demo: {
+                src: 'build/<%= rel.name %>.min.js',
+                dest: 'demo/js/<%= rel.name %>.min.js'
+            }
+        },
+        yuidoc: {
+            compile: {
+                name: '<%= rel.name %>.js Physics Engine API Documentation',
+                description: '<%= pkg.description %>',
+                version: '<%= pkg.version %>',
+                url: '<%= pkg.homepage %>',
+                options: {
+                    paths : 'src',
+                    outdir: 'doc',
+                    linkNatives: true
+                }
+            }
+        }
+    });
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-yuidoc');
 
-  grunt.registerTask('default', ['concat', 'uglify']);
+    grunt.registerTask('default', ['concat', 'uglify', 'copy', 'yuidoc']);
 }

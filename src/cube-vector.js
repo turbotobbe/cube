@@ -1,73 +1,163 @@
-(function (_, undefined){
+/**
+ * The Vector module
+ *
+ * @class Vector
+ */
+(function (_, undefined) {
 
-  /*
-   * Class: Vector
-   */
+    _.Vector = {
 
-  _.Vector = function(x, y) {
-    this.x = x;
-    this.y = y;
-  };
+        /**
+         * Build a new Vector.
+         *
+         * @method build
+         * @param x {number} x coordinate
+         * @param y {number} y coordinate
+         * @returns {Object} A Vector
+         */
+        build: function (x, y) {
+            return { x: x, y: y };
+        },
 
-  _.Vector.prototype.clone = function() {
-    return new _.Vector(this.x, this.y);
-  };
+        /**
+         * Clone a Vector.
+         *
+         * @method clone
+         * @param vector {object} The Vector to clone.
+         * @returns {object} A Vector
+         */
+        clone: function(vector) {
+            return { x: vector.x, y: vector.y };
+        },
 
-  _.Vector.prototype.neg = function() {
-    this.x = -this.x;
-    this.y = -this.y;
-    return this;
-  };
+        /**
+         * Negate a Vector.
+         *
+         * @method neg
+         * @param vector {object} The Vector to negate.
+         * @param [clone=false] {boolean} Clone Vector.
+         * @returns {object} A Vector
+         */
+        neg: function (vector, clone) {
+            var obj = clone ? {x: undefined, y: undefined} : vector;
+            obj.x = -vector.x;
+            obj.y = -vector.y;
+            return obj;
+        },
 
-  _.Vector.prototype.add = function(vector) {
-    this.x += vector.x;
-    this.y += vector.y;
-    return this;
-  };
+        /**
+         * Add vector A and vector B.
+         *
+         * @method add
+         * @param vectorA {object} The Vector to add to.
+         * @param vectorB {object} The Vector to add.
+         * @param [clone=false] {boolean} Clone Vector A.
+         * @returns {object} A Vector
+         */
+        add: function (vectorA, vectorB, clone) {
+            var obj = clone ? {x: undefined, y: undefined} : vectorA;
+            obj.x = vectorA.x + vectorB.x;
+            obj.y = vectorA.y + vectorB.y;
+            return obj;
+        },
 
-  _.Vector.prototype.sub = function(vector) {
-    this.x -= vector.x;
-    this.y -= vector.y;
-    return this;
-  };
+        /**
+         * Subtract vector B from vector A.
+         *
+         * @method sub
+         * @param vectorA {object} The Vector to subtract from.
+         * @param vectorB {object} The Vector to subtract.
+         * @param [clone=false] {boolean} Clone Vector A.
+         * @returns {object} A Vector
+         */
+        sub: function (vectorA, vectorB, clone) {
+            var obj = clone ? {x: undefined, y: undefined} : vectorA;
+            obj.x = vectorA.x - vectorB.x;
+            obj.y = vectorA.y - vectorB.y;
+            return obj;
+        },
 
-  _.Vector.prototype.mul = function(scalar) {
-    this.x *= scalar;
-    this.y *= scalar;
-    return this;
-  };
+        /**
+         * Multiplies a Vector with a Scalar.
+         *
+         * @method mul
+         * @param vector {object} The Vector to multiply.
+         * @param scalar {object} A Scalar to multiply with..
+         * @param [clone=false] {boolean} Clone Vector A.
+         * @returns {object} A Vector
+         */
+        mul: function (vector, scalar, clone) {
+            var obj = clone ? {x: undefined, y: undefined} : vector;
+            obj.x = vector.x * scalar;
+            obj.y = vector.y * scalar;
+            return obj;
+        },
 
-  _.Vector.prototype.div = function(scalar) {
-    this.x /= scalar;
-    this.y /= scalar;
-    return this;
-  };
+        /**
+         * Divide a Vector with a Scalar.
+         *
+         * @method div
+         * @param vector {object} The Vector to divide.
+         * @param scalar {number} The scalar to divide with.
+         * @param [clone=false] {boolean} Clone Vector A.
+         * @returns {object} A Vector
+         */
+        div: function (vector, scalar, clone) {
+            var obj = clone ? {x: undefined, y: undefined} : vector;
+            obj.x = vector.x / scalar;
+            obj.y = vector.y / scalar;
+            return obj;
+        },
 
-  _.Vector.prototype.rot = function(angle, point) {
-    var cos = Math.cos(angle);
-    var sin = Math.sin(angle);
-    var dx = (point === undefined) ? 0 : point.x;
-    var dy = (point === undefined) ? 0 : point.y;
-    var x = this.x;
-    this.x = dx + ((x - dx) * cos - (this.y - dy) * sin);
-    this.y = dy + ((x - dx) * sin + (this.y - dy) * cos);
-    return this;
-  };
+        /**
+         * Get the normal Vector.
+         *
+         * @method normal
+         * @param vector {object} A vector
+         * @param [clone=false] {boolean} Clone Vector A.
+         * @returns {object} A Vector
+         */
+        normal: function (vector, clone) {
+            var obj = clone ? {x: undefined, y: undefined} : vector;
+            var scalar = this.mag(obj);
+            return this.div(obj, scalar, clone);
+        },
 
-  _.Vector.prototype.mag = function() {
-    return Math.sqrt((this.x * this.x) + (this.y * this.y));
-  };
+        /**
+         * Calculate the magnitude (length) of a Vector.
+         *
+         * @method mag
+         * @param vector {object} A Vector
+         * @returns {number} A Scalar
+         */
+        mag: function (vector) {
+            return Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
+        },
 
-  _.Vector.prototype.mag2 = function() {
-    return (this.x * this.x) + (this.y * this.y);
-  };
+        /**
+         * Calculate the dot product of vector A and vector B.
+         *
+         * @method dot
+         * @param vectorA {object} A Vector.
+         * @param vectorB {object} A Vector.
+         * @returns {number} A Scalar
+         */
+        dot: function (vectorA, vectorB) {
+            return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
+        },
 
-  _.Vector.prototype.dot = function(vector) {
-    return (this.x * vector.x) + (this.y * vector.y);
-  };
+        /**
+         * Calculate the cross product of vector A and vector B.
+         *
+         * @method cross
+         * @param vectorA {object} A Vector.
+         * @param vectorB {object} A Vector.
+         * @returns {number} A Scalar
+         */
+        cross: function (vectorA, vectorB) {
+            return (vectorA.x * vectorB.y) - (vectorA.y * vectorB.x);
+        }
 
-  _.Vector.prototype.cross = function(vector) {
-    return (this.x * vector.y) - (this.y * vector.x);
-  };
+    };
 
-}(window.CUBE = window.CUBE || {}));
+}(CUBE));

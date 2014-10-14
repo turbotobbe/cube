@@ -20,28 +20,37 @@
     var bodies = [];
     var tree = new _.QuadTree({n: 0, s: height, w: 0, e: width});
 
-    for (var i = 0; i < 10; i++) {
-        var radius = _.rand(10, 20);
-        var x = _.rand(radius * 3, width - (radius * 3));
-        var y = _.rand(radius * 3, height - (radius * 3));
-        var velocity = new _.Vector(_.rand(-5, 5), _.rand(-5, 5));
-        var body = new _.Circle(new _.Vector(x, y), radius, velocity);
+    var c1 = new _.Circle(_.Vector.build(40,40), 40, _.Vector.build(11,10));
+    var c2 = new _.Circle(_.Vector.build(240,240), 30, _.Vector.build(-5,-5));
+    bodies.push(c1);
+    bodies.push(c2);
+    tree.insert(c1);
+    tree.insert(c2);
+    /*
+    for (var i = 0; i < 2; i++) {
+        var radius = _.rand(20, 20);
+        var x = 100 + 60 * i;//_.rand(radius * 3, width - (radius * 3));
+        var y = 100 + 60*i; //_.rand(radius * 3, height - (radius * 3));
+        var velocity = _.Vector.build(_.rand(-2, 2), _.rand(-2, 2));
+        var body = new _.Circle(_.Vector.build(x, y), radius, velocity);
         bodies.push(body);
-        //tree.insert(body);
+        tree.insert(body);
     }
+    */
 
     function clear() {
         context.clearRect(0, 0, width, height);
     };
 
     function update(dt) {
-        tree.clear();
+//        tree.clear();
         for (var i = 0; i < bodies.length; i++) {
             var body = bodies[i];
-            body.center.add(body.velocity);
+            _.Vector.add(body.center, body.velocity);
             bounce(body);
-            tree.insert(body);
-            //tree.update(body);
+            collide(body);
+            //tree.insert(body);
+            tree.update(body);
         }
     };
 
@@ -60,6 +69,62 @@
         } else if (box.s > height) {
             body.velocity.y = -body.velocity.y;
             body.center.y += body.velocity.y;
+        }
+    };
+
+    function collide(body) {
+        var objs = tree.select(body);
+        for (var j = 0; j < objs.length; j++) {
+            var obj = objs[j];
+
+            var dn = _.Vector.sub(body.center, obj.center, true);
+            var sr = body.radius + obj.radius;
+            var dx = _.Vector.mag(dn);
+
+            if (dx < sr) {
+                console.log(['hit', dx, sr]);
+
+                // http://www.adambrookesprojects.co.uk/project/canvas-collision-elastic-collision-tutorial/
+                var normal = _.Vector.normal(_.Vector.sub(obj.center, body.center, true));
+                var tangent = _.Vector.build(-normal.y, normal.x);
+
+                var bodyScalarNormal = _.Vector.dot(normal, body.velocity);
+                var objScalarNormal = _.Vector.dot(normal, obj.velocity);
+
+                var bodyScalarTangent = _.Vector.dot(tangent, body.velocity);
+                var objScalarTangent = _.Vector.dot(tangent, obj.velocity);
+
+                /*
+                var m1 = body.mass();
+                var m2 = obj.mass();
+                var sm = m1 + m2;
+
+                dn.normalize();
+
+                var dt = _.Vector.build(dn.y, -dn.x);
+                var mt = dn.clone().mul(body.radius + obj.radius - dx);
+
+                body.center.add(mt.clone().mul(m2/sm));
+                obj.center.add(mt.clone().mul(-m1/sm));
+
+                var v1 = dn.clone().mul(body.velocity.dot(dn)).mag();
+                var v2 = dn.clone().mul(obj.velocity.dot(dn)).mag();
+
+                var cr = 1;
+
+                body.velocity = dt.clone().mul(body.velocity.dot(dt));
+                body.velocity.add(dn.clone().mul((cr * m2 * (v2 - v1) + m1 * v1 + m2 * v2) / sm));
+
+                obj.velocity = dt.clone().mul(obj.velocity.dot(dt));
+                obj.velocity.add(dn.clone().mul((cr * m1 * (v1 - v2) + m2 * v2 + m1 * v1) / sm));
+                */
+            }
+            /*
+            var m1 = 2 * Math.PI * body.radius;
+            var v1 = body.velocity.clone();
+            var m2 = 2 * Math.PI * obj.radius;
+            var v2 = obj.velocity.clone();
+            */
         }
     };
 
@@ -102,7 +167,7 @@
                 var objs = tree.select(body);
                 context.strokeStyle = 'rgba(0,0,255,0.3)';
                 context.lineWidth = 1;
-                for (var j=0; j<objs.length; j++) {
+                for (var j = 0; j < objs.length; j++) {
                     var obj = objs[j];
                     context.beginPath();
                     context.moveTo(mid.x, mid.y);
@@ -175,7 +240,7 @@
         paint();
         time = now;
         stop -= dt;
-        if (stop>0) {
+        if (stop > 0) {
             requestAnimationFrame(frame);
         }
     };
