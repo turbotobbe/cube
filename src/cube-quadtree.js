@@ -3,10 +3,9 @@
  */
 (function (_, undefined) {
 
-    _.QuadTree = function (box, parent, level) {
+    _.QuadTree = function (box, level) {
         this.box = box; // {n:0, s:400, w:0, e:800}
-        this.parent = parent;
-        this.level = level || 0;
+        this.lev = level || 0;
         this.ver = box.n + ((box.s - box.n) / 2);
         this.hor = box.w + ((box.e - box.w) / 2);
 
@@ -30,55 +29,79 @@
             var boxSW = { n: quad.ver, s: quad.box.s, w: quad.box.w, e: quad.hor };
 
             if (_.QuadTree.contains(boxNW, b)) {
-                quad.nw = quad.nw || new _.QuadTree(boxNW, quad, quad.level+1);
+                quad.nw = quad.nw || new _.QuadTree(boxNW, quad.lev + 1);
                 quad = quad.nw;
             } else if (_.QuadTree.contains(boxNE, b)) {
-                quad.ne = quad.ne || new _.QuadTree(boxNE, quad, quad.level+1);
+                quad.ne = quad.ne || new _.QuadTree(boxNE, quad.lev + 1);
                 quad = quad.ne;
             } else if (_.QuadTree.contains(boxSE, b)) {
-                quad.se = quad.se || new _.QuadTree(boxSE, quad, quad.level+1);
+                quad.se = quad.se || new _.QuadTree(boxSE, quad.lev + 1);
                 quad = quad.se;
             } else if (_.QuadTree.contains(boxSW, b)) {
-                quad.sw = quad.sw || new _.QuadTree(boxSW, quad, quad.level+1);
+                quad.sw = quad.sw || new _.QuadTree(boxSW, quad.lev + 1);
                 quad = quad.sw;
             } else {
-                body.quad = quad; // reference to quad
                 quad.objs.push(body);
                 quad = undefined;
             }
         }
     };
 
+    /*
     _.QuadTree.prototype.update = function (body, box) {
+         var b = box || body.box();
+         var quad = body.quad;
+         quad.remove(body);
+         body.quad = undefined;
+         this.insert(body);
+         while (quad.parent !== undefined && _.QuadTree.contains(quad.box, b) === false) {
+         // find a parent that contains the new bounds
+         // stop at the top quad
+         quad = quad.parent;
+         }
+         // insert the new bounds
+         quad.insert(body, b);
+    };
+     */
 
-        var b = box || body.box();
-        var quad = body.quad;
-        quad.remove(body);
-        body.quad = undefined;
-        this.insert(body);
-        /*
-        while (quad.parent !== undefined && _.QuadTree.contains(quad.box, b) === false) {
-            // find a parent that contains the new bounds
-            // stop at the top quad
-            quad = quad.parent;
+    _.QuadTree.prototype.clear = function() {
+        var stack = [this];
+        while (stack.length > 0) {
+            var quad = stack.pop();
+            quad.objs = [];
+            if (quad.nw) stack.push(quad.nw);
+            if (quad.ne) stack.push(quad.ne);
+            if (quad.se) stack.push(quad.se);
+            if (quad.sw) stack.push(quad.sw);
         }
-        // insert the new bounds
-        quad.insert(body, b);
-        */
     };
 
+    /*
     _.QuadTree.prototype.remove = function (body) {
-        var quad = body.quad;
+        var quad = this.lookup(body);
         var index = quad.objs.indexOf(body);
         if (index >= 0) {
             quad.objs.splice(index, 1);
         }
         body.quad = undefined;
     };
+    */
 
     _.QuadTree.prototype.select = function (body, box) {
-
+        var b = box || body.box();
         var objs = [];
+        var stack = [this];
+        while (stack.length > 0) {
+            var quad = stack.pop();
+            if (_.QuadTree.contains(quad.box, b)) {
+                Array.prototype.push.apply(objs, quad.objs);
+                if (quad.nw) stack.push(quad.nw);
+                if (quad.ne) stack.push(quad.ne);
+                if (quad.se) stack.push(quad.se);
+                if (quad.sw) stack.push(quad.sw);
+            }
+        }
+        return objs;
 
         // add up the tree
         var quad = (body.quad === undefined) ? undefined : body.quad.parent;
