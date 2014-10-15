@@ -23,7 +23,7 @@ module.exports = function (grunt) {
         copy: {
             demo: {
                 src: 'build/<%= rel.name %>.min.js',
-                dest: 'demo/js/<%= rel.name %>.min.js'
+                dest: 'demo/js/cube.js'
             }
         },
         yuidoc: {
