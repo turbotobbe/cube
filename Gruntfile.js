@@ -5,25 +5,53 @@ module.exports = function (grunt) {
         rel: {
             name:'<%= pkg.name %>-<%= pkg.version %>'
         },
+        clean: {
+            src: ['target', 'demo/js/<%= rel.name %>.min.js', 'demo/js/<%= rel.name %>-demo.min.js']
+        },
         concat: {
-            pack: {
-                src: ['src/cube.js', 'src/cube-*.js'],
-                dest: 'build/<%= rel.name %>.js'
+            main: {
+                src: ['src/main/cube.js', 'src/main/cube-*.js'],
+                dest: 'target/<%= rel.name %>.js'
+            },
+            demo: {
+                src: ['src/demo/demo.js', 'src/demo/demo-*.js'],
+                dest: 'target/<%= rel.name %>-demo.js'
             }
         },
         uglify: {
-            options: {
-                banner: '/*! <%= rel.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+            main: {
+                options: {
+                    banner: '/*! <%= rel.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                },
+                files: {
+                    'target/<%= rel.name %>.min.js': ['<%= concat.main.dest %>']
+                }
             },
-            dist: {
-                src: 'build/<%= rel.name %>.js',
-                dest: 'build/<%= rel.name %>.min.js'
+            demo: {
+                options: {
+                    banner: '/*! <%= rel.name %>-demo <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                },
+                files: {
+                    'target/<%= rel.name %>-demo.min.js': ['<%= concat.demo.dest %>']
+                }
             }
         },
         copy: {
+            main: {
+                src: 'target/<%= rel.name %>.js',
+                dest: 'demo/js/<%= rel.name %>.js'
+            },
             demo: {
-                src: 'build/<%= rel.name %>.min.js',
-                dest: 'demo/js/cube.js'
+                src: 'target/<%= rel.name %>-demo.js',
+                dest: 'demo/js/<%= rel.name %>-demo.js'
+            },
+            dist: {
+                expand: true,
+                cwd: 'target/',
+                src: ['<%= rel.name %>.js', '<%= rel.name %>.min.js'],
+                dest: 'dist/',
+                flatten: true,
+                filter: 'isFile',
             }
         },
         yuidoc: {
@@ -33,18 +61,23 @@ module.exports = function (grunt) {
                 version: '<%= pkg.version %>',
                 url: '<%= pkg.homepage %>',
                 options: {
-                    paths : 'src',
-                    outdir: 'doc',
+                    paths : 'src/main',
+                    outdir: 'target/doc',
                     linkNatives: true
                 }
             }
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
 
-    grunt.registerTask('default', ['concat', 'uglify', 'copy', 'yuidoc']);
+//    grunt.registerTask('clear', ['clean']);
+    grunt.registerTask('default', ['concat', 'uglify', 'copy:main', 'copy:demo', 'yuidoc']);
+    grunt.registerTask('demo', ['concat', 'uglify', 'copy:main', 'copy:demo']);
+    grunt.registerTask('release', ['clean', 'concat:main', 'uglify:main', 'copy:dist']);
+
 }
