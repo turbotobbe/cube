@@ -1,163 +1,146 @@
 /**
- * The Vector module
- *
- * @class Vector
+ * @class: Vector
  */
-(function (_, undefined) {
+(function(_, undefined){
 
-    _.Vector = {
+  /**
+   * @class Vector
+   * @constructor
+   * @param x {number} x coordinate.
+   * @param y {number} y coordinate.
+   */
+  _.Vector = function(x, y) {
+    this.x = x;
+    this.y = y;
+    this._magnitude = undefined;
+    this._normal = undefined;
+  };
 
-        /**
-         * Build a new Vector.
-         *
-         * @method build
-         * @param x {number} x coordinate
-         * @param y {number} y coordinate
-         * @returns {Object} A Vector
-         */
-        build: function (x, y) {
-            return { x: x, y: y };
-        },
+  _.Vector.prototype = {
 
-        /**
-         * Clone a Vector.
-         *
-         * @method clone
-         * @param vector {object} The Vector to clone.
-         * @returns {object} A Vector
-         */
-        clone: function(vector) {
-            return { x: vector.x, y: vector.y };
-        },
+    get x() {
+      return this._x;
+    },
+    set x(value) {
+      if (this._x !== value) {
+        this._x = value;
+        delete this._magnitude;
+        delete this._normal;
+      }
+    },
 
-        /**
-         * Negate a Vector.
-         *
-         * @method neg
-         * @param vector {object} The Vector to negate.
-         * @param [clone=false] {boolean} Clone Vector.
-         * @returns {object} A Vector
-         */
-        neg: function (vector, clone) {
-            var obj = clone ? {x: undefined, y: undefined} : vector;
-            obj.x = -vector.x;
-            obj.y = -vector.y;
-            return obj;
-        },
+    get y() {
+      return this._y;
+    },
+    set y(value) {
+      if (this._y !== value) {
+        this._y = value;
+        delete this._magnitude;
+        delete this._normal;
+      }
+    },
 
-        /**
-         * Add vector A and vector B.
-         *
-         * @method add
-         * @param vectorA {object} The Vector to add to.
-         * @param vectorB {object} The Vector to add.
-         * @param [clone=false] {boolean} Clone Vector A.
-         * @returns {object} A Vector
-         */
-        add: function (vectorA, vectorB, clone) {
-            var obj = clone ? {x: undefined, y: undefined} : vectorA;
-            obj.x = vectorA.x + vectorB.x;
-            obj.y = vectorA.y + vectorB.y;
-            return obj;
-        },
+    get normal() {
+      if (this._normal === undefined) {
+        // call get magnitude to cache value since we need it for divide after clone
+        this.magnitude;
+        var obj = this.clone();
+        this._normal = obj.divide(this.magnitude);
+      }
+      return this._normal;
+    },
+    set normal(value) {
+      throw "Illegal Assignment"
+    },
 
-        /**
-         * Subtract vector B from vector A.
-         *
-         * @method sub
-         * @param vectorA {object} The Vector to subtract from.
-         * @param vectorB {object} The Vector to subtract.
-         * @param [clone=false] {boolean} Clone Vector A.
-         * @returns {object} A Vector
-         */
-        sub: function (vectorA, vectorB, clone) {
-            var obj = clone ? {x: undefined, y: undefined} : vectorA;
-            obj.x = vectorA.x - vectorB.x;
-            obj.y = vectorA.y - vectorB.y;
-            return obj;
-        },
+    get magnitude() {
+      if (this._magnitude === undefined) {
+        this._magnitude = Math.sqrt((this.x*this.x)+(this.y*this.y));
+      }
+      return this._magnitude;
+    },
+    set magnitude(value) {
+      throw "Illegal Assignment"
+    },
 
-        /**
-         * Multiplies a Vector with a Scalar.
-         *
-         * @method mul
-         * @param vector {object} The Vector to multiply.
-         * @param scalar {object} A Scalar to multiply with..
-         * @param [clone=false] {boolean} Clone Vector A.
-         * @returns {object} A Vector
-         */
-        mul: function (vector, scalar, clone) {
-            var obj = clone ? {x: undefined, y: undefined} : vector;
-            obj.x = vector.x * scalar;
-            obj.y = vector.y * scalar;
-            return obj;
-        },
+    /**
+     * Clone this Vector
+     *
+     * @method clone
+     * @returns {object} The Cloned Vector.
+     */
+    clone: function() {
+      var obj = new _.Vector(this.x, this.y);
+      obj._magnitude = this._magnitude;
+      obj._normal = this._normal;
+      return obj;
 
-        /**
-         * Divide a Vector with a Scalar.
-         *
-         * @method div
-         * @param vector {object} The Vector to divide.
-         * @param scalar {number} The scalar to divide with.
-         * @param [clone=false] {boolean} Clone Vector A.
-         * @returns {object} A Vector
-         */
-        div: function (vector, scalar, clone) {
-            var obj = clone ? {x: undefined, y: undefined} : vector;
-            obj.x = vector.x / scalar;
-            obj.y = vector.y / scalar;
-            return obj;
-        },
+    },
 
-        /**
-         * Get the normal Vector.
-         *
-         * @method normal
-         * @param vector {object} A vector
-         * @param [clone=false] {boolean} Clone Vector A.
-         * @returns {object} A Vector
-         */
-        normal: function (vector, clone) {
-            var obj = clone ? {x: undefined, y: undefined} : vector;
-            var scalar = this.mag(obj);
-            return this.div(obj, scalar, clone);
-        },
+    /**
+     * Negate the Vector.
+     *
+     * @method negate
+     * @param [clone=false] {boolean} Clone this Vector
+     */
+    negate: function(clone) {
+      var obj = clone ? this.clone() : this;
+      obj.x = -obj.x;
+      obj.y = -obj.y;
+      return obj;
+    },
 
-        /**
-         * Calculate the magnitude (length) of a Vector.
-         *
-         * @method mag
-         * @param vector {object} A Vector
-         * @returns {number} A Scalar
-         */
-        mag: function (vector) {
-            return Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
-        },
+    /**
+     * Add a Vector to the Vector.
+     *
+     * @method add
+     * @param vector {object} The Vector to add
+     * @param [clone=false] {boolean} Clone this Vector
+     */
+    add: function(vector, clone) {
+      var obj = clone ? this.clone() : this;
+      obj.x += vector.x;
+      obj.y += vector.y;
+      return obj;
+    },
 
-        /**
-         * Calculate the dot product of vector A and vector B.
-         *
-         * @method dot
-         * @param vectorA {object} A Vector.
-         * @param vectorB {object} A Vector.
-         * @returns {number} A Scalar
-         */
-        dot: function (vectorA, vectorB) {
-            return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
-        },
+    subtract: function(vector, clone) {
+      var obj = clone ? this.clone() : this;
+      obj.x -= vector.x;
+      obj.y -= vector.y;
+      return obj;
+    },
 
-        /**
-         * Calculate the cross product of vector A and vector B.
-         *
-         * @method cross
-         * @param vectorA {object} A Vector.
-         * @param vectorB {object} A Vector.
-         * @returns {number} A Scalar
-         */
-        cross: function (vectorA, vectorB) {
-            return (vectorA.x * vectorB.y) - (vectorA.y * vectorB.x);
-        }
+    multiply: function(scalar, clone) {
+      var obj = clone ? this.clone() : this;
+      obj.x *= scalar;
+      obj.y *= scalar;
+      return obj;
+    },
 
-    };
+    divide: function(scalar, clone) {
+      var obj = clone ? this.clone() : this;
+      obj.x /= scalar;
+      obj.y /= scalar;
+      return obj;
+    },
+
+    dot: function(vector) {
+      return _.dot(this, vector);
+    },
+
+    cross: function(vector) {
+      return _.cross(this, vector);
+    }
+
+  };
+
+  _.dot = function(vectorA, vectorB) {
+    return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
+  };
+
+  _.cross = function(vectorA, vectorB) {
+    return (vectorA.x * vectorB.y) - (vectorA.y * vectorB.x);
+  };
 
 }(CUBE));
