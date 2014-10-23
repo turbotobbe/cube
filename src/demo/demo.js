@@ -4,6 +4,9 @@
 
 (function(DEMO, _, $, undefined){
 
+  DEMO.games = {};
+  DEMO.runs = [];
+
   // fix widths of all canvas
   $('canvas').each(function(){
     $(this).width($(this).parent().width());
@@ -11,16 +14,11 @@
 
   DEMO.Game = function(id) {
     this.id = id;
-  };
-
-  DEMO.Game.prototype.init = function() {
-    console.log('init ' + this.id + " ...");
-  };
-  DEMO.Game.prototype.halt = function() {
-    console.log('halt ' + this.id + " ...");
-  };
-  DEMO.Game.prototype.resume = function() {
-    console.log('resume ' + this.id + " ...");
+    this.canvas = document.getElementById(this.id);
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+    this.context = this.canvas.getContext('2d');
+    this.time = null;
   };
 
   DEMO.create = function (id) {
@@ -28,21 +26,30 @@
     return DEMO.games[id];
   };
 
+  DEMO.frame = function(now) {
+      for (var i=0; i<DEMO.runs.length; i++) {
+          var game = DEMO.runs[i];
+          var dt = (game.time == null) ? 0 : now - game.time;
+          game.clear();
+          game.update(dt);
+          game.paint();
+          game.time = now;
+      }
+      requestAnimationFrame(DEMO.frame);
+  };
+
+  requestAnimationFrame(DEMO.frame);
+
   // hook up start and stop
   $('canvas').click(function(e){
     var id = $(this).attr('id');
-    DEMO.start(id);
-  });
-
-  DEMO.games = [];
-  DEMO.start = function(id) {
     var game = DEMO.games[id];
-    for (var key in DEMO.games) {
-      if (DEMO.games[id] !== DEMO.games[key]) {
-        DEMO.games[key].halt();
-      }
+    var index = DEMO.runs.indexOf(game);
+    if (index < 0) {
+      DEMO.runs.push(game);
+    } else {
+      DEMO.runs.splice(index);
     }
-    DEMO.games[id].toggle();
-  };
+  });
 
 }(window.DEMO = window.DEMO || {}, window.CUBE, jQuery));

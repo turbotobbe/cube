@@ -1,68 +1,57 @@
 (function (DEMO, _, undefined) {
 
     var game = DEMO.create('demo-balls');
-
-    game.canvas = document.getElementById(game.id);
-    game.width = game.canvas.width;
-    game.height = game.canvas.height;
-    game.context = game.canvas.getContext('2d');
-    game.ball = new _.Circle(_.Vector.build(game.width/20,game.height/2), 10, _.Vector.build(4,6));
-    game.time = null;
-    game.running = false;
+    game.balls = [];
+    game.balls.push(new _.Circle(_.Vector.build(game.width/20,game.height/4), 10, _.Vector.build(-6,-4)));
+    game.balls.push(new _.Circle(_.Vector.build(game.width/20*19,game.height/4*3), 10, _.Vector.build(4,6)));
 
     game.clear = function() {
-        this.context.clearRect(0, 0, this.width, this.height);
+        for (var i=0; i<this.balls.length; i++) {
+            var box = this.balls[i].box();
+            this.context.clearRect(box.w-1, box.n-1, box.e-box.w+2, box.s-box.n+2);
+        }
     };
 
     game.update = function(dt) {
-        var ball = this.ball;
-        _.Vector.add(ball.center, ball.velocity);
-        var box = ball.box();
-        if (box.w < 0) {
-            ball.velocity.x = -ball.velocity.x;
-            ball.center.x += ball.velocity.x;
-        } else if (box.e > this.width) {
-            ball.velocity.x = -ball.velocity.x;
-            ball.center.x += ball.velocity.x;
+        for (var i=0; i<this.balls.length; i++) {
+            var ball = this.balls[i];
+            _.Vector.add(ball.center, ball.velocity);
+            var box = ball.box();
+            if (box.w < 0) {
+                ball.velocity.x = -ball.velocity.x;
+                ball.center.x += ball.velocity.x;
+            } else if (box.e > this.width) {
+                ball.velocity.x = -ball.velocity.x;
+                ball.center.x += ball.velocity.x;
+            }
+            if (box.n < 0) {
+                ball.velocity.y = -ball.velocity.y;
+                ball.center.y += ball.velocity.y;
+            } else if (box.s > this.height) {
+                ball.velocity.y = -ball.velocity.y;
+                ball.center.y += ball.velocity.y;
+            }
         }
-        if (box.n < 0) {
-            ball.velocity.y = -ball.velocity.y;
-            ball.center.y += ball.velocity.y;
-        } else if (box.s > this.height) {
-            ball.velocity.y = -ball.velocity.y;
-            ball.center.y += ball.velocity.y;
+        var ballA = this.balls[0];
+        var ballB = this.balls[1];
+        var radiusAB = ballA.radius + ballB.radius;
+        var vectorAB = _.Vector.clone(ballA.center);
+        _.Vector.sub(vectorAB, ballB.center);
+        var magnitudeAB = _.Vector.mag(vectorAB);
+
+        if (magnitudeAB < radiusAB) {
+            console.log([radiusAB, magnitudeAB]);
         }
     };
 
     game.paint = function() {
-        var ball = this.ball;
-        this.context.fillStyle = 'rgba(0,0,255, 0.5)';
-        this.context.beginPath();
-        this.context.arc(ball.center.x, ball.center.y, ball.radius, 0, 2 * Math.PI);
-        this.context.fill();
-    };
-
-    game.frame = function(now) {
-        var dt = (this.time == null) ? 0 : now - this.time;
-        game.clear();
-        game.update(dt);
-        game.paint();
-        game.time = now;
-        if (game.running) {
-            requestAnimationFrame(game.frame);
+        for (var i=0; i<this.balls.length; i++) {
+            var ball = this.balls[i];
+            this.context.fillStyle = 'rgba(0,0,255, 0.5)';
+            this.context.beginPath();
+            this.context.arc(ball.center.x, ball.center.y, ball.radius, 0, 2 * Math.PI);
+            this.context.fill();
         }
     };
 
-    game.halt = function() {
-        this.running = false;
-    };
-
-    game.toggle = function() {
-        this.running = !this.running;
-        if (this.running) {
-            requestAnimationFrame(game.frame);
-        }
-    };
-
-    requestAnimationFrame(game.frame);
 }(window.DEMO, window.CUBE));
