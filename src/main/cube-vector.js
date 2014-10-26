@@ -3,6 +3,10 @@
  */
 (function(_, undefined){
 
+  _.vector = function(x, y) {
+    return new _.Vector(x, y);
+  };
+
   /**
    * @class Vector
    * @constructor
@@ -10,10 +14,10 @@
    * @param y {number} y coordinate.
    */
   _.Vector = function(x, y) {
-    this.x = x;
-    this.y = y;
-    this._magnitude = undefined;
-    this._normal = undefined;
+    this._x = x;
+    this._y = y;
+    // this._magnitude = undefined;
+    // this._normal = undefined;
   };
 
   _.Vector.prototype = {
@@ -24,8 +28,8 @@
     set x(value) {
       if (this._x !== value) {
         this._x = value;
-        delete this._magnitude;
-        delete this._normal;
+        this._magnitude = undefined;
+        this._normal = undefined;
       }
     },
 
@@ -35,8 +39,8 @@
     set y(value) {
       if (this._y !== value) {
         this._y = value;
-        delete this._magnitude;
-        delete this._normal;
+        this._magnitude = undefined;
+        this._normal = undefined;
       }
     },
 
@@ -126,21 +130,13 @@
     },
 
     dot: function(vector) {
-      return _.dot(this, vector);
+      return (this.x * vector.x) + (this.y * vector.y);
     },
 
     cross: function(vector) {
-      return _.cross(this, vector);
+      return (this.x * vector.y) - (this.y * vector.x);
     }
 
-  };
-
-  _.dot = function(vectorA, vectorB) {
-    return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
-  };
-
-  _.cross = function(vectorA, vectorB) {
-    return (vectorA.x * vectorB.y) - (vectorA.y * vectorB.x);
   };
 
 }(CUBE));

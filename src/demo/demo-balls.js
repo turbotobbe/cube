@@ -2,42 +2,45 @@
 
     var game = DEMO.create('demo-balls');
     game.balls = [];
-    game.balls.push(new _.Circle(_.Vector.build(game.width/20,game.height/4), 10, _.Vector.build(-6,-4)));
-    game.balls.push(new _.Circle(_.Vector.build(game.width/20*19,game.height/4*3), 10, _.Vector.build(4,6)));
+    game.balls.push(_.circle(_.vector(game.width/20, game.height/4), 20, _.vector(-6,-4)));
+    game.balls.push(_.circle(_.vector(game.width/20*19,game.height/4*3), 20, _.vector(4,6)));
 
     game.clear = function() {
         for (var i=0; i<this.balls.length; i++) {
-            var box = this.balls[i].box();
-            this.context.clearRect(box.w-1, box.n-1, box.e-box.w+2, box.s-box.n+2);
+            var box = this.balls[i].box;
+            this.context.clearRect(box.west-2, box.north-2, box.width+4, box.height+4);
         }
     };
 
     game.update = function(dt) {
         for (var i=0; i<this.balls.length; i++) {
             var ball = this.balls[i];
-            _.Vector.add(ball.center, ball.velocity);
-            var box = ball.box();
-            if (box.w < 0) {
+            ball.center.add(ball.velocity);
+            ball.moved();
+            var box = ball.box;
+            if (box.west < 0) {
                 ball.velocity.x = -ball.velocity.x;
                 ball.center.x += ball.velocity.x;
-            } else if (box.e > this.width) {
+                ball.moved();
+            } else if (box.east > this.width) {
                 ball.velocity.x = -ball.velocity.x;
                 ball.center.x += ball.velocity.x;
+                ball.moved();
             }
-            if (box.n < 0) {
+            if (box.north < 0) {
                 ball.velocity.y = -ball.velocity.y;
                 ball.center.y += ball.velocity.y;
-            } else if (box.s > this.height) {
+                ball.moved();
+            } else if (box.south > this.height) {
                 ball.velocity.y = -ball.velocity.y;
                 ball.center.y += ball.velocity.y;
+                ball.moved();
             }
         }
         var ballA = this.balls[0];
         var ballB = this.balls[1];
         var radiusAB = ballA.radius + ballB.radius;
-        var vectorAB = _.Vector.clone(ballA.center);
-        _.Vector.sub(vectorAB, ballB.center);
-        var magnitudeAB = _.Vector.mag(vectorAB);
+        var magnitudeAB = ballA.center.subtract(ballB.center, true).magnitude;
 
         if (magnitudeAB < radiusAB) {
             console.log([radiusAB, magnitudeAB]);
@@ -45,12 +48,22 @@
     };
 
     game.paint = function() {
+        var ctx = this.context;
         for (var i=0; i<this.balls.length; i++) {
             var ball = this.balls[i];
-            this.context.fillStyle = 'rgba(0,0,255, 0.5)';
-            this.context.beginPath();
-            this.context.arc(ball.center.x, ball.center.y, ball.radius, 0, 2 * Math.PI);
-            this.context.fill();
+            ctx.fillStyle = 'rgba(0,0,255, 0.5)';
+            ctx.beginPath();
+            ctx.arc(ball.center.x, ball.center.y, ball.radius, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'red';
+            ctx.strokeRect(ball.box.west, ball.box.north, ball.box.width, ball.box.height);
+            ctx.beginPath();
+            ctx.moveTo(ball.center.x, ball.center.y);
+            ctx.lineTo(ball.center.x+ball.velocity.x, ball.center.y+ball.velocity.y);
+            ctx.closePath();
+            ctx.stroke();
         }
     };
 

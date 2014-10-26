@@ -9,7 +9,9 @@
 
   // fix widths of all canvas
   $('canvas').each(function(){
-    $(this).width($(this).parent().width());
+    var width = $(this).parent().width();
+    var height = width * 9/16;
+    $(this).prop({width: width, height: height});
   });
 
   DEMO.Game = function(id) {

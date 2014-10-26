@@ -1,204 +1,161 @@
-/**
- * The QuadTree class.
- *
- * @class QuadTree
- */
-(function (_, undefined) {
+(function(_, undefined){
 
-    /**
-     * Create a new QuadTree.
-     *
-     * @class QuadTree
-     * @constructor
-     * @param box {object} The outer box
-     * @param [level=0] {number} The level if the QuadTree
-     */
-    _.QuadTree = function (box, level) {
-        this.box = box; // TODO clone rect
-        this.lev = level || 0;
-        this.ver = box.n + ((box.s - box.n) / 2);
-        this.hor = box.w + ((box.e - box.w) / 2);
+  _.QuadTree = function(rect, level) {
+    this.rect = rect;
+    this.level = level || 0;
+    this.rects = [];
+    // this.next = undefined;
+    // this.nw = undefined;
+    // this.ne = undefined;
+    // this.sw = undefined;
+    // this.se = undefined;
+  };
 
-        this.nw = undefined;
-        this.ne = undefined;
-        this.se = undefined;
-        this.sw = undefined;
+  _.QuadTree.prototype = {
 
-        this.objs = [];
-    };
+    get rect() {
+      return this._rect;
+    },
+    set rect(value) {
+      throw "Illegal Assignment";
+    },
 
-    /**
-     * Insert a body into the QuadTree.
-     *
-     * @method insert
-     * @param body {object} The body to insert.
-     * @param [box=body.box()] The bounding box.
-     * @returns {QuadTree}
-     */
-    _.QuadTree.prototype.insert = function (body, box) {
+    get level() {
+      return this._level;
+    },
+    set level(value) {
+      throw "Illegal Assignment";
+    },
 
-        var b = box || body.box();
-        var quad = this;
-        while (quad !== undefined) {
+    get rects() {
+      return this._rects;
+    },
+    set rects(value) {
+      throw "Illegal Assignment";
+    },
 
-            var boxNW = { n: quad.box.n, s: quad.ver, w: quad.box.w, e: quad.hor };
-            var boxNE = { n: quad.box.n, s: quad.ver, w: quad.hor, e: quad.box.e };
-            var boxSE = { n: quad.ver, s: quad.box.s, w: quad.hor, e: quad.box.e };
-            var boxSW = { n: quad.ver, s: quad.box.s, w: quad.box.w, e: quad.hor };
+    get next() {
+      if (this._next === undefined) {
+        this._next = this.rect.clone().divide(2);
+      }
+      return this._next;
+    },
+    set next(value) {
+      throw "Illegal Assignment";
+    },
 
-            if (_.QuadTree.contains(boxNW, b)) {
-                quad.nw = quad.nw || new _.QuadTree(boxNW, quad.lev + 1);
-                quad = quad.nw;
-            } else if (_.QuadTree.contains(boxNE, b)) {
-                quad.ne = quad.ne || new _.QuadTree(boxNE, quad.lev + 1);
-                quad = quad.ne;
-            } else if (_.QuadTree.contains(boxSE, b)) {
-                quad.se = quad.se || new _.QuadTree(boxSE, quad.lev + 1);
-                quad = quad.se;
-            } else if (_.QuadTree.contains(boxSW, b)) {
-                quad.sw = quad.sw || new _.QuadTree(boxSW, quad.lev + 1);
-                quad = quad.sw;
-            } else {
-                body.quad = quad;
-                quad.objs.push(body);
-                quad = undefined;
+    get nw() {
+      if (this._nw === undefined) {
+        var rect = this.next.clone();
+        rect.x -= rect.width / 2;
+        rect.y -= rect.height / 2;
+        this._nw = new _.QuadTree(rect, this.level+1);
+      }
+      return this._nw;
+    },
+    set nw(value) {
+      throw "Illegal Assignment";
+    },
+
+    get ne() {
+      if (this._ne === undefined) {
+        var rect = this.next.clone();
+        rect.x += rect.width / 2;
+        rect.y -= rect.height / 2;
+        this._ne = new _.QuadTree(rect, this.level+1);
+      }
+      return this._ne;
+    },
+    set ne(value) {
+      throw "Illegal Assignment";
+    },
+
+    get se() {
+      if (this._se === undefined) {
+        var rect = this.next.clone();
+        rect.x += rect.width / 2;
+        rect.y += rect.height / 2;
+        this._se = new _.QuadTree(rect, this.level+1);
+      }
+      return this._se;
+    },
+    set se(value) {
+      throw "Illegal Assignment";
+    },
+
+    get sw() {
+      if (this._sw === undefined) {
+        var rect = this.next.clone();
+        rect.x -= rect.width / 2;
+        rect.y += rect.height / 2;
+        this._sw = new _.QuadTree(rect, this.level+1);
+      }
+      return this._sw;
+    },
+    set sw(value) {
+      throw "Illegal Assignment";
+    },
+
+    clear: function() {
+      var stack = [this];
+      while (stack.length > 0) {
+        var quad = stack.pop();
+        quad.rects = [];
+        if (quad._nw) stack.push(quad._nw);
+        if (quad._ne) stack.push(quad._ne);
+        if (quad._sw) stack.push(quad._sw);
+        if (quad._se) stack.push(quad._se);
+      }
+      return this;
+    },
+
+    insert: function(rect) {
+      var quad = this;
+      while (quad !== undefined) {
+        if (quad.nw.rect.covers(rect)) {
+          quad = quad.nw;
+        } else if (quad.ne.rect.covers(rect)) {
+          quad = quad.ne;
+        } else if (quad.sw.rect.covers(rect)) {
+          quad = quad.sw;
+        } else if (quad.se.rect.covers(rect)) {
+          quad = quad.se;
+        } else {
+          rect.quad = quad;
+          quad.rects.push(rect);
+          quad = undefined;
+        }
+      }
+      return this;
+    },
+
+    update: function(rect) {
+      var quad = rect.quad;
+      var index = quad.rects.indexOf(rect);
+      quad.rects.splice(index, 1);
+      rect.quad = undefined;
+      this.insert(rect);
+      return this;
+    },
+
+    select: function(rect) {
+      var rects = [];
+      var stack = [this];
+      while (stack.length >= 0) {
+        var quad = stack.pop();
+        if (quad.rect.covers(rect)) {
+          for (var i=0; i<quad.rects.length; i++) {
+            if (quad.rects[i] !== rect && quad.rects[i].intersects(rect)) {
+              rects.push(quad.rects[i]);
             }
+          }
+          if (quad._nw) stack.push(quad._nw);
+          if (quad._ne) stack.push(quad._ne);
+          if (quad._sw) stack.push(quad._sw);
+          if (quad._se) stack.push(quad._se);
         }
-        return this;
-    };
-
-    /**
-     * Update the body in the QuadTree.
-     *
-     * @method update
-     * @param body {object} The body to update.
-     * @param [box=body.box()] The bounding box.
-     * @returns {QuadTree}
-     */
-    _.QuadTree.prototype.update = function (body, box) {
-        var b = box || body.box();
-        var quad = body.quad;
-
-        // remove previous
-        var index = quad.objs.indexOf(body);
-        if (index >= 0) {
-            quad.objs.splice(index, 1);
-        }
-        body.quad = undefined;
-
-        // reinsert
-        this.insert(body);
-
-        return this;
-    };
-
-    /**
-     * clear the QuadTree from bodies.
-     *
-     * @method clear
-     * @returns {QuadTree}
-     */
-    _.QuadTree.prototype.clear = function () {
-        var stack = [this];
-        while (stack.length > 0) {
-            var quad = stack.pop();
-            quad.objs = [];
-            if (quad.nw) stack.push(quad.nw);
-            if (quad.ne) stack.push(quad.ne);
-            if (quad.se) stack.push(quad.se);
-            if (quad.sw) stack.push(quad.sw);
-        }
-        return this;
-    };
-
-    /*
-     _.QuadTree.prototype.remove = function (body) {
-     var quad = this.lookup(body);
-     var index = quad.objs.indexOf(body);
-     if (index >= 0) {
-     quad.objs.splice(index, 1);
-     }
-     body.quad = undefined;
-     };
-     */
-
-    /**
-     * Select the collicion candidates for the body.
-     *
-     * @method select
-     * @param body {object} The body.
-     * @param [box=body.box()} The bounding box.
-     * @returns {Array} The candidates.
-     */
-    _.QuadTree.prototype.select = function (body, box) {
-        var b = box || body.box();
-        var objs = [];
-        var stack = [this];
-        while (stack.length > 0) {
-            var quad = stack.pop();
-            if (_.QuadTree.contains(quad.box, b)) {
-
-                for (var i = 0; i < quad.objs.length; i++) {
-                    var obj = quad.objs[i];
-                    if (obj !== body && _.QuadTree.overlap(obj.box(), b)) {
-                        objs.push(obj);
-                    }
-                }
-                //Array.prototype.push.apply(objs, quad.objs);
-                if (quad.nw) stack.push(quad.nw);
-                if (quad.ne) stack.push(quad.ne);
-                if (quad.se) stack.push(quad.se);
-                if (quad.sw) stack.push(quad.sw);
-            }
-        }
-        return objs;
-
-        // add up the tree
-        var quad = (body.quad === undefined) ? undefined : body.quad.parent;
-        while (quad != undefined) {
-            objs = Array.prototype.concat.apply(objs, quad.objs);
-            quad = quad.parent;
-        }
-
-        // add down the tree
-        var quads = [body.quad];
-        while (quads.length > 0) {
-            quad = quads.pop();
-            if (quad.nw) quads.push(quad.nw);
-            if (quad.ne) quads.push(quad.ne);
-            if (quad.se) quads.push(quad.se);
-            if (quad.sw) quads.push(quad.sw);
-            objs = Array.prototype.concat.apply(objs, quad.objs);
-        }
-
-        // remove self reference
-        var index = objs.indexOf(body);
-        if (index >= 0) {
-            objs.splice(index, 1);
-        }
-        return objs;
-    };
-
-    /**
-     * Check if box A fully contains box B
-     *
-     * @method contains
-     * @param boxA {object} A box.
-     * @param boxB {object} A box.
-     * @returns {boolean} True if box A full contains box B. false otherwise.
-     */
-    _.QuadTree.contains = function (boxA, boxB) {
-        return boxA.n < boxB.n && boxA.s > boxB.s && boxA.w < boxB.w && boxA.e > boxB.e;
-    };
-
-    /**
-     * Check if box A overlap at all with box B
-     * @method overlap
-     * @param boxA {object} A box.
-     * @param boxB {object} A box.
-     * @returns {boolean} True if box A overlaps box B. false otherwise.
-     */
-    _.QuadTree.overlap = function (boxA, boxB) {
-        return (boxA.n > boxB.s || boxA.s < boxB.n || boxA.w > boxB.e || boxA.e < boxB.w) === false;
-    };
+      }
+      return rects;
+    }
+  };
 }(CUBE));
