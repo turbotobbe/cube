@@ -1,7 +1,7 @@
 {
   "name": "cube",
   "version": "0.1.0",
-  "description": "Javascript Physics Engine",
+  "description": "Javascript 2D Physics Engine",
   "author": "Thobias Bergqvist",
   "devDependencies": {
     "grunt": "^0.4.5",

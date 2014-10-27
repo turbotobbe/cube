@@ -1,10 +1,15 @@
-(function(_, undefined){
+/**
+ * The Bounds class
+ *
+ * @class Bounds
+ */
+(function (_, undefined) {
 
-  _.bounds = function(x, y, width, height) {
+  _.bounds = function (x, y, width, height) {
     return new _.Bounds(x, y, width, height);
   };
 
-  _.Bounds = function(x, y, width, height) {
+  _.Bounds = function (x, y, width, height) {
     this._vector = _.vector(x, y);
     this._width = width;
     this._height = height;
@@ -90,14 +95,14 @@
       return this._vector._y;
     },
 
-    get width(){
+    get width() {
       if (this._width === undefined) {
         this._width = this.east - this.west;
       }
       return this._width;
     },
 
-    get height(){
+    get height() {
       if (this._height === undefined) {
         this._height = this.south - this.north;
       }
@@ -132,7 +137,7 @@
       return this._east;
     },
 
-    clone: function() {
+    clone: function () {
       var bounds = new _.Bounds();
       bounds._vector = this._vector.clone();
       bounds._height = this._height;
@@ -157,7 +162,7 @@
     set magnitude(value) {
       this._vector.magnitude = value;
     },
-    negate: function(clone) {
+    negate: function (clone) {
       if (!clone) {
         this._north = undefined;
         this._south = undefined;
@@ -167,7 +172,7 @@
       return this._vector.negate(clone);
     },
 
-    add: function(vector, clone) {
+    add: function (vector, clone) {
       if (!clone) {
         this._north = undefined;
         this._south = undefined;
@@ -177,7 +182,7 @@
       return this._vector.add(vector, clone);
     },
 
-    subtract: function(vector, clone) {
+    subtract: function (vector, clone) {
       if (!clone) {
         this._north = undefined;
         this._south = undefined;
@@ -187,7 +192,7 @@
       return this._vector.subtract(vector, clone);
     },
 
-    multiply: function(scalar, clone) {
+    multiply: function (scalar, clone) {
       if (!clone) {
         this._north = undefined;
         this._south = undefined;
@@ -197,7 +202,7 @@
       return this._vector.multiply(scalar, clone);
     },
 
-    divide: function(scalar, clone) {
+    divide: function (scalar, clone) {
       if (!clone) {
         this._north = undefined;
         this._south = undefined;
@@ -207,15 +212,15 @@
       return this._vector.divide(scalar, clone);
     },
 
-    dot: function(vector) {
+    dot: function (vector) {
       return this._vector.dot(vector);
     },
 
-    cross: function(vector) {
+    cross: function (vector) {
       return this._vector.cross(clone);
     },
 
-    covers: function(bounds) {
+    covers: function (bounds) {
       if (this.north > bounds.north) {
         return false;
       } else if (this.south < bounds.south) {
@@ -228,7 +233,7 @@
       return true;
     },
 
-    intersect: function(bounds) {
+    intersect: function (bounds) {
       if (this.north > bounds.south) {
         return false;
       } else if (this.south < bounds.north) {

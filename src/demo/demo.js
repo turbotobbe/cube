@@ -2,19 +2,19 @@
  * Licenced to me :)
  */
 
-(function(DEMO, _, $, undefined){
-  
+(function (DEMO, _, $, undefined) {
+
   DEMO.games = {};
   DEMO.runs = [];
 
   // fix widths of all canvas
-  $('canvas').each(function(){
+  $('canvas').each(function () {
     var width = $(this).parent().width();
-    var height = width * 9/16;
+    var height = width * 9 / 16;
     $(this).prop({width: width, height: height});
   });
 
-  DEMO.Game = function(id) {
+  DEMO.Game = function (id) {
     this.id = id;
     this.canvas = document.getElementById(this.id);
     this.width = this.canvas.width;
@@ -28,22 +28,22 @@
     return DEMO.games[id];
   };
 
-  DEMO.frame = function(now) {
-      for (var i=0; i<DEMO.runs.length; i++) {
-          var game = DEMO.runs[i];
-          var dt = (game.time == null) ? 0 : now - game.time;
-          game.clear();
-          game.update(dt);
-          game.paint();
-          game.time = now;
-      }
-      requestAnimationFrame(DEMO.frame);
+  DEMO.frame = function (now) {
+    for (var i = 0; i < DEMO.runs.length; i++) {
+      var game = DEMO.runs[i];
+      var dt = (game.time == null) ? 0 : now - game.time;
+      game.clear();
+      game.update(dt);
+      game.paint();
+      game.time = now;
+    }
+    requestAnimationFrame(DEMO.frame);
   };
 
   requestAnimationFrame(DEMO.frame);
 
   // hook up start and stop
-  $('canvas').click(function(e){
+  $('canvas').click(function (e) {
     var id = $(this).attr('id');
     var game = DEMO.games[id];
     var index = DEMO.runs.indexOf(game);

@@ -1,4 +1,6 @@
 node_modules
 npm-debug.log
 doc
+target
+demo/js/cube*
 .idea

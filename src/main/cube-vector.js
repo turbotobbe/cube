@@ -1,9 +1,9 @@
 /**
- * @class: Vector
+ * @class Vector
  */
-(function(_, undefined){
+(function (_, undefined) {
 
-  _.vector = function(x, y) {
+  _.vector = function (x, y) {
     return new _.Vector(x, y);
   };
 
@@ -13,13 +13,19 @@
    * @param x {number} x coordinate.
    * @param y {number} y coordinate.
    */
-  _.Vector = function(x, y) {
+  _.Vector = function (x, y) {
     this._x = x;
     this._y = y;
   };
 
   _.Vector.prototype = {
 
+    /**
+     * The X coordinate
+     *
+     * @property x
+     * @type {number}
+     */
     get x() {
       return this._x;
     },
@@ -31,6 +37,12 @@
       }
     },
 
+    /**
+     * The Y coordinate
+     *
+     * @property x
+     * @type {number}
+     */
     get y() {
       return this._y;
     },
@@ -57,7 +69,7 @@
 
     get magnitude() {
       if (this._magnitude === undefined) {
-        this._magnitude = Math.sqrt((this.x*this.x)+(this.y*this.y));
+        this._magnitude = Math.sqrt((this.x * this.x) + (this.y * this.y));
       }
       return this._magnitude;
     },
@@ -71,7 +83,7 @@
      * @method clone
      * @returns {object} The Cloned Vector.
      */
-    clone: function() {
+    clone: function () {
       var obj = new _.Vector(this.x, this.y);
       obj._magnitude = this._magnitude;
       obj._normal = this._normal;
@@ -85,7 +97,7 @@
      * @method negate
      * @param [clone=false] {boolean} Clone this Vector
      */
-    negate: function(clone) {
+    negate: function (clone) {
       var obj = clone ? this.clone() : this;
       obj.x = -obj.x;
       obj.y = -obj.y;
@@ -99,39 +111,39 @@
      * @param vector {object} The Vector to add
      * @param [clone=false] {boolean} Clone this Vector
      */
-    add: function(vector, clone) {
+    add: function (vector, clone) {
       var obj = clone ? this.clone() : this;
       obj.x += vector.x;
       obj.y += vector.y;
       return obj;
     },
 
-    subtract: function(vector, clone) {
+    subtract: function (vector, clone) {
       var obj = clone ? this.clone() : this;
       obj.x -= vector.x;
       obj.y -= vector.y;
       return obj;
     },
 
-    multiply: function(scalar, clone) {
+    multiply: function (scalar, clone) {
       var obj = clone ? this.clone() : this;
       obj.x *= scalar;
       obj.y *= scalar;
       return obj;
     },
 
-    divide: function(scalar, clone) {
+    divide: function (scalar, clone) {
       var obj = clone ? this.clone() : this;
       obj.x /= scalar;
       obj.y /= scalar;
       return obj;
     },
 
-    dot: function(vector) {
+    dot: function (vector) {
       return (this.x * vector.x) + (this.y * vector.y);
     },
 
-    cross: function(vector) {
+    cross: function (vector) {
       return (this.x * vector.y) - (this.y * vector.x);
     }
 

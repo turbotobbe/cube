@@ -1,6 +1,11 @@
-(function(_, undefined){
+/**
+ * The QuadTree class
+ *
+ * @class QuadTree
+ */
+(function (_, undefined) {
 
-  _.QuadTree = function(bounds, level) {
+  _.QuadTree = function (bounds, level) {
     this.bounds = bounds;
     this.level = level || 0;
     this.objs = [];
@@ -23,7 +28,7 @@
         var bounds = this.next.clone();
         bounds.x -= bounds.width / 2;
         bounds.y -= bounds.height / 2;
-        this._nw = new _.QuadTree(bounds, this.level+1);
+        this._nw = new _.QuadTree(bounds, this.level + 1);
       }
       return this._nw;
     },
@@ -36,7 +41,7 @@
         var bounds = this.next.clone();
         bounds.x += bounds.width / 2;
         bounds.y -= bounds.height / 2;
-        this._ne = new _.QuadTree(bounds, this.level+1);
+        this._ne = new _.QuadTree(bounds, this.level + 1);
       }
       return this._ne;
     },
@@ -49,7 +54,7 @@
         var bounds = this.next.clone();
         bounds.x += bounds.width / 2;
         bounds.y += bounds.height / 2;
-        this._se = new _.QuadTree(bounds, this.level+1);
+        this._se = new _.QuadTree(bounds, this.level + 1);
       }
       return this._se;
     },
@@ -62,7 +67,7 @@
         var bounds = this.next.clone();
         bounds.x -= bounds.width / 2;
         bounds.y += bounds.height / 2;
-        this._sw = new _.QuadTree(bounds, this.level+1);
+        this._sw = new _.QuadTree(bounds, this.level + 1);
       }
       return this._sw;
     },
@@ -70,7 +75,7 @@
       throw "Illegal Assignment";
     },
 
-    clear: function() {
+    clear: function () {
       var stack = [this];
       while (stack.length > 0) {
         var quad = stack.pop();
@@ -83,7 +88,7 @@
       return this;
     },
 
-    insert: function(bounds) {
+    insert: function (bounds) {
       var quad = this;
       while (quad !== undefined) {
         if (quad.nw.bounds.covers(bounds)) {
@@ -103,7 +108,7 @@
       return this;
     },
 
-    update: function(bounds) {
+    update: function (bounds) {
       var quad = bounds.quad;
       var index = quad.rects.indexOf(bounds);
       quad.rects.splice(index, 1);
@@ -112,13 +117,13 @@
       return this;
     },
 
-    select: function(bounds) {
+    select: function (bounds) {
       var rects = [];
       var stack = [this];
       while (stack.length >= 0) {
         var quad = stack.pop();
         if (quad.bounds.covers(bounds)) {
-          for (var i=0; i<quad.rects.length; i++) {
+          for (var i = 0; i < quad.rects.length; i++) {
             if (quad.objs[i] !== bounds && quad.rects[i].intersects(bounds)) {
               rects.push(quad.rects[i]);
             }
