@@ -1,42 +1,16 @@
 (function(_, undefined){
 
-  _.QuadTree = function(rect, level) {
-    this.rect = rect;
+  _.QuadTree = function(bounds, level) {
+    this.bounds = bounds;
     this.level = level || 0;
-    this.rects = [];
-    // this.next = undefined;
-    // this.nw = undefined;
-    // this.ne = undefined;
-    // this.sw = undefined;
-    // this.se = undefined;
+    this.objs = [];
   };
 
   _.QuadTree.prototype = {
 
-    get rect() {
-      return this._rect;
-    },
-    set rect(value) {
-      throw "Illegal Assignment";
-    },
-
-    get level() {
-      return this._level;
-    },
-    set level(value) {
-      throw "Illegal Assignment";
-    },
-
-    get rects() {
-      return this._rects;
-    },
-    set rects(value) {
-      throw "Illegal Assignment";
-    },
-
     get next() {
       if (this._next === undefined) {
-        this._next = this.rect.clone().divide(2);
+        this._next = this.bounds.clone().scale(0.5);
       }
       return this._next;
     },
@@ -46,10 +20,10 @@
 
     get nw() {
       if (this._nw === undefined) {
-        var rect = this.next.clone();
-        rect.x -= rect.width / 2;
-        rect.y -= rect.height / 2;
-        this._nw = new _.QuadTree(rect, this.level+1);
+        var bounds = this.next.clone();
+        bounds.x -= bounds.width / 2;
+        bounds.y -= bounds.height / 2;
+        this._nw = new _.QuadTree(bounds, this.level+1);
       }
       return this._nw;
     },
@@ -59,10 +33,10 @@
 
     get ne() {
       if (this._ne === undefined) {
-        var rect = this.next.clone();
-        rect.x += rect.width / 2;
-        rect.y -= rect.height / 2;
-        this._ne = new _.QuadTree(rect, this.level+1);
+        var bounds = this.next.clone();
+        bounds.x += bounds.width / 2;
+        bounds.y -= bounds.height / 2;
+        this._ne = new _.QuadTree(bounds, this.level+1);
       }
       return this._ne;
     },
@@ -72,10 +46,10 @@
 
     get se() {
       if (this._se === undefined) {
-        var rect = this.next.clone();
-        rect.x += rect.width / 2;
-        rect.y += rect.height / 2;
-        this._se = new _.QuadTree(rect, this.level+1);
+        var bounds = this.next.clone();
+        bounds.x += bounds.width / 2;
+        bounds.y += bounds.height / 2;
+        this._se = new _.QuadTree(bounds, this.level+1);
       }
       return this._se;
     },
@@ -85,10 +59,10 @@
 
     get sw() {
       if (this._sw === undefined) {
-        var rect = this.next.clone();
-        rect.x -= rect.width / 2;
-        rect.y += rect.height / 2;
-        this._sw = new _.QuadTree(rect, this.level+1);
+        var bounds = this.next.clone();
+        bounds.x -= bounds.width / 2;
+        bounds.y += bounds.height / 2;
+        this._sw = new _.QuadTree(bounds, this.level+1);
       }
       return this._sw;
     },
@@ -100,7 +74,7 @@
       var stack = [this];
       while (stack.length > 0) {
         var quad = stack.pop();
-        quad.rects = [];
+        quad.objs = [];
         if (quad._nw) stack.push(quad._nw);
         if (quad._ne) stack.push(quad._ne);
         if (quad._sw) stack.push(quad._sw);
@@ -109,43 +83,43 @@
       return this;
     },
 
-    insert: function(rect) {
+    insert: function(bounds) {
       var quad = this;
       while (quad !== undefined) {
-        if (quad.nw.rect.covers(rect)) {
+        if (quad.nw.bounds.covers(bounds)) {
           quad = quad.nw;
-        } else if (quad.ne.rect.covers(rect)) {
+        } else if (quad.ne.bounds.covers(bounds)) {
           quad = quad.ne;
-        } else if (quad.sw.rect.covers(rect)) {
+        } else if (quad.sw.bounds.covers(bounds)) {
           quad = quad.sw;
-        } else if (quad.se.rect.covers(rect)) {
+        } else if (quad.se.bounds.covers(bounds)) {
           quad = quad.se;
         } else {
-          rect.quad = quad;
-          quad.rects.push(rect);
+          bounds.quad = quad;
+          quad.rects.push(bounds);
           quad = undefined;
         }
       }
       return this;
     },
 
-    update: function(rect) {
-      var quad = rect.quad;
-      var index = quad.rects.indexOf(rect);
+    update: function(bounds) {
+      var quad = bounds.quad;
+      var index = quad.rects.indexOf(bounds);
       quad.rects.splice(index, 1);
-      rect.quad = undefined;
-      this.insert(rect);
+      bounds.quad = undefined;
+      this.insert(bounds);
       return this;
     },
 
-    select: function(rect) {
+    select: function(bounds) {
       var rects = [];
       var stack = [this];
       while (stack.length >= 0) {
         var quad = stack.pop();
-        if (quad.rect.covers(rect)) {
+        if (quad.bounds.covers(bounds)) {
           for (var i=0; i<quad.rects.length; i++) {
-            if (quad.rects[i] !== rect && quad.rects[i].intersects(rect)) {
+            if (quad.objs[i] !== bounds && quad.rects[i].intersects(bounds)) {
               rects.push(quad.rects[i]);
             }
           }

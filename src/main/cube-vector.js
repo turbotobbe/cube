@@ -16,8 +16,6 @@
   _.Vector = function(x, y) {
     this._x = x;
     this._y = y;
-    // this._magnitude = undefined;
-    // this._normal = undefined;
   };
 
   _.Vector.prototype = {

@@ -5,8 +5,8 @@
  */
 (function (_, undefined) {
 
-    _.circle = function(center, radius, velocity, density) {
-        return new _.Circle(center, radius, velocity, density);
+    _.circle = function(x, y, radius, velocity, density) {
+        return new _.Circle(x, y, radius, velocity, density);
     };
 
     /**
@@ -18,26 +18,27 @@
      * @param radius {number} The initial radius.
      * @param [velocity] {object} The initial Velocity Vector.
      */
-    _.Circle = function (center, radius, velocity, density) {
-        this._box = new _.Rect(center, radius*2, radius*2);
-        this._center = center;
+    _.Circle = function (x, y, radius, velocity, density) {
+        this._bounds = new _.bounds(x, y, radius*2, radius*2);
         this._radius = radius;
         this._velocity = velocity || new _.Vector(0,0);
         this._density = density || 1;
-        // this.area = undefined;
-        // this.mass = undefined;
+        // area mass
     };
 
     _.Circle.prototype = {
 
-        get center() {
-            return this._center;
+        get x() {
+            return this.bounds.x;
         },
-        set center(value) {
-            if (this._center !== value) {
-                this._center = value;
-                this.box.center = value;
-            }
+        set x(value) {
+            this.bounds.x = value;
+        },
+        get y() {
+            return this.bounds.y;
+        },
+        set y(value) {
+            this.bounds.y = value;
         },
 
         get radius() {
@@ -46,8 +47,8 @@
         set radius(value) {
             if (this._radius !== value) {
                 this._radius = value;
-                this.box.width = value*2;
-                this.box.height = value*2;
+                this.bounds.width = value*2;
+                this.bounds.height = value*2;
                 this._area = undefined;
                 this._mass = undefined;
             }
@@ -72,10 +73,10 @@
             }
         },
 
-        get box() {
-            return this._box;
+        get bounds() {
+            return this._bounds;
         },
-        set box(value) {
+        set bounds(value) {
             throw "Illegal Assignment";
         },
 
@@ -103,22 +104,20 @@
         },
 
         clone: function() {
-            return new _.Circle(this.center.clone(), this.radius, this.velocity.clone(), this.density);
+            var circle = _.circle();
+            circle._bounds = this._bounds.clone();
+            circle._radius = this._radius;
+            circle._velocity = this._velocity.clone();
+            circle._density = this._density;
+            circle._area = this._area;
+            circle._mass = this._mass;
         },
 
-        moved: function() {
-            this.box.moved();
-        },
-        
-        multiply: function(scalar) {
-            this.radius *= scalar;
-            return this;
-        },
-        divide: function(scalar) {
-            this.radius /= scalar;
-            return this;
+        scale: function(scalar, clone) {
+            var circle = clone ? this.clone() : this;
+            circle.radius *= scalar;
+            return circle;
         }
-
     };
 
 }(CUBE));

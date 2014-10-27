@@ -1,159 +1,101 @@
 (function(_, undefined){
 
-  _.rect = function(center, width, height) {
-    return new _.Rect(center, width, height);
+  _.rect = function(x, y, width, height, velocity, density) {
+    return new _.Rect(x, y, width, height, velocity, density);
   };
 
-  _.Rect = function(center, width, height) {
-    this.center = center;
-    this.width = width;
-    this.height = height;
-    // this._north = undefined;
-    // this._south = undefined;
-    // this._west = undefined;
-    // this._east = undefined;
+  _.Rect = function(x, y, width, height, velocity, density) {
+    this._bounds = new _.bounds(x, y, width, height);
+    this._velocity = velocity || new _.Vector(0,0);
+    this._density = density || 1;
   };
 
   _.Rect.prototype = {
 
-    get center() {
-      if (this._center === undefined) {
-        var x = this.west + ((this.east - this.west) / 2);
-        var y = this.north + ((this.south - this.north) / 2);
-        this._center = new _.Vector(x, y);
-      }
-      return this._center;
+    get x() {
+        return this.bounds.x;
     },
-    set center(value) {
-      if (this._center !== value) {
-        this._center = value;
-        this._north = undefined;
-        this._south = undefined;
-        this._west = undefined;
-        this._east = undefined;
-      }
+    set x(value) {
+        this.bounds.x = value;
     },
-
+    get y() {
+        return this.bounds.y;
+    },
+    set y(value) {
+        this.bounds.y = value;
+    },
     get width() {
-      if (this._width === undefined) {
-        this._width = this.east - this.west;
-      }
-      return this._width;
+      return this.bounds.width;
     },
     set width(value) {
-      if (this._width !== value) {
-        this._width = value;
-        this._west = undefined;
-        this._east = undefined;
-      }
+      this.bounds.width = value;
     },
-
     get height() {
-      if (this._height === undefined) {
-        this._height = this.south - this.north;
-      }
-      return this._height;
+      return this.bounds.height;
     },
     set height(value) {
-      if (this._height !== value) {
-        this._height = value;
-        this._north = undefined;
-        this._south = undefined;
-      }
+      this.bounds.height = value;
+    },
+    get velocity() {
+        return this._velocity;
+    },
+    set velocity(value) {
+        if (this._velocity != value) {
+            this._velocity = value;
+        }
     },
 
-    get north() {
-      if (this._north === undefined) {
-        this._north = this.center.y - (this.height / 2);
-      }
-      return this._north;
+    get density() {
+        return this._density;
     },
-    set north(value) {
-      if (this._north !== value) {
-        this._north = value;
-      }
+    set density(value) {
+        if (this._density !== value) {
+            this._density = value;
+            this._mass = undefined;
+        }
     },
 
-    get south() {
-      if (this._south === undefined) {
-        this._south = this.center.y + (this.height / 2);
-      }
-      return this._south;
+    get bounds() {
+        return this._bounds;
     },
-    set south(value) {
-      if (this._south !== value) {
-        this._south = value;
-      }
+    set bounds(value) {
+        throw "Illegal Assignment";
     },
 
-    get west() {
-      if (this._west === undefined) {
-        this._west = this.center.x - (this.width / 2);
-      }
-      return this._west;
+    get area() {
+        if (this._area === undefined) {
+            this._area = this.width * this.height;
+        }
+        return this._area;
     },
-    set west(value) {
-      if (this._west !== value) {
-        this._west = value;
-      }
+    set area(value) {
+        throw "Illegal Assignment";
     },
 
-    get east() {
-      if (this._east === undefined) {
-        this._east = this.center.x + (this.width / 2);
-      }
-      return this._east;
+    get mass() {
+        if (this._mass === undefined) {
+            // this is mass for a cube.
+            // introduce volume for correctness
+            var volume = 1 * this.width * this.height;
+            this._mass = this.density * volume;
+        }
+        return this._mass;
     },
-    set east(value) {
-      if (this._east !== value) {
-        this._east = value;
-      }
+    set mass(value) {
+        throw "Illegal Assignment";
     },
 
     clone: function() {
-      return new _.Rect(this.center.clone(), this.width, this.height);
+      var rect = _.rect();
+      rect._bounds = this._bounds.clone();
+      rect._velocity = this._velocity.clone();
+      rect._density = this._density;
+      return rect;
     },
-    moved: function() {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-    },
-    multiply: function(scalar) {
-      this.width *= scalar;
-      this.height *= scalar;
-      return this;
-    },
-    divide: function(scalar) {
-      this.width /= scalar;
-      this.height /= scalar;
-      return this;
-    },
-
-    covers: function(rect) {
-      if (this.north > rect.north) {
-        return false;
-      } else if (this.south < rect.south) {
-        return false;
-      } else if (this.west > rect.west) {
-        return false;
-      } else if (this.east < rect.east) {
-        return false;
-      }
-      return true;
-    },
-
-    intersect: function(rect) {
-      if (this.north > rest.south) {
-        return false;
-      } else if (this.south < rest.north) {
-        return false;
-      } else if (this.west > rest.east) {
-        return false;
-      } else if (this.east < rest.west) {
-        return false;
-      }
-      return true;
+    scale: function(scalar, clone) {
+        var rect = clone ? this.clone() : this;
+        rect.width *= scalar;
+        rect.height *= scalar;
     }
 
   };
