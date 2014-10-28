@@ -13,7 +13,7 @@
     this._vector = _.vector(x, y);
     this._width = width;
     this._height = height;
-    this.velocity = velocity || _.vector(0,0);
+    this.velocity = velocity || _.vector(0, 0);
     this.density = density || 1;
   };
 
@@ -21,57 +21,61 @@
 
     get x() {
       if (this._vector.x === undefined) {
-        this._vector.x = this.west + (this.width / 2);
+        this._vector.x = this.west + ((this.east - this.west) / 2);
       }
       return this._vector.x;
     },
     set x(value) {
       if (this._vector.x !== value) {
         this._vector.x = value;
-        this._west = undefined;
-        this._east = undefined;
+        this._west = this._vector.x - (this.width / 2);
+        this._east = this._vector.x + (this.width / 2);
+        this.onMove && this.onMove();
       }
     },
 
     get y() {
       if (this._vector.y === undefined) {
-        this._vector.y = this.north + (this.height / 2);
+        this._vector.y = this._north + ((this.south - this.north) / 2);
       }
       return this._vector._y;
     },
     set y(value) {
       if (this._vector.y !== value) {
         this._vector.y = value;
-        this._north = undefined;
-        this._south = undefined;
+        this._north = this._vector.y - (this.height / 2);
+        this._south = this._vector.y + (this.height / 2);
+        this.onMove && this.onMove();
       }
     },
 
     get width() {
       if (this._width === undefined) {
-        this._width = this.east - this.west;
+        this._width = this.east - this_west;
       }
       return this._width;
     },
     set width(value) {
       if (this._width !== value) {
         this._width = value;
-        this._west = undefined;
-        this._east = undefined;
+        this._west = this._vector.x - (this.width / 2);
+        this._east = this._vector.x + (this.width / 2);
+        this.onResize && this.onResize();
       }
     },
 
     get height() {
       if (this._height === undefined) {
-        this._height = this.south - this.north;
+        this._height = this._south - this._north;
       }
       return this._height;
     },
     set height(value) {
       if (this._height !== value) {
         this._height = value;
-        this._north = undefined;
-        this._south = undefined;
+        this._north = this._vector.y - (this.height / 2);
+        this._south = this._vector.y + (this.height / 2);
+        this.onResize && this.onResize();
       }
     },
 
@@ -85,8 +89,10 @@
     set north(value) {
       if (this._north !== value) {
         this._north = value;
-        this._vector.y = undefined;
-        this._height = undefined;
+        this._vector.y = this.north + ((this.south - this.north) / 2);
+        this._height = this.south - this.north;
+        this.onResize && this.onResize();
+        this.onMove && this.onMove();
       }
     },
 
@@ -100,14 +106,16 @@
     set south(value) {
       if (this._south !== value) {
         this._south = value;
-        this._vector.y = undefined;
-        this._height = undefined;
+        this._vector.y = this.north + ((this.south - this.north) / 2);
+        this._height = this.south - this.north;
+        this.onResize && this.onResize();
+        this.onMove && this.onMove();
       }
     },
 
     get west() {
       if (this._west === undefined) {
-        this._west = this._vector.x - (this.width / 2);
+        this._west = this._vector.x - (this._width / 2);
       }
       return this._west;
     },
@@ -115,14 +123,16 @@
     set west(value) {
       if (this._west !== value) {
         this._west = value;
-        this._vector.x = undefined;
-        this._width = undefined;
+        this._vector.x = this.west + ((this.east - this.west) / 2);
+        this._width = this.east - this.west;
+        this.onResize && this.onResize();
+        this.onMove && this.onMove();
       }
     },
 
     get east() {
       if (this._east === undefined) {
-        this._east = this._vector.x + (this.width / 2);
+        this._east = this._vector.x + (this._width / 2);
       }
       return this._east;
     },
@@ -130,8 +140,10 @@
     set east(value) {
       if (this._east !== value) {
         this._east = value;
-        this._vector.x = undefined;
-        this._width = undefined;
+        this._vector.x = this.west + ((this.east - this.west) / 2);
+        this._width = this.east - this.west;
+        this.onResize && this.onResize();
+        this.onMove && this.onMove();
       }
     }
   };
@@ -154,6 +166,7 @@
       this._south = undefined;
       this._west = undefined;
       this._east = undefined;
+      this.onResize && this.onResize();
     }
     return this._vector.negate(clone);
   };
@@ -164,6 +177,7 @@
       this._south = undefined;
       this._west = undefined;
       this._east = undefined;
+      this.onResize && this.onResize();
     }
     return this._vector.add(vector, clone);
   };
@@ -174,6 +188,7 @@
       this._south = undefined;
       this._west = undefined;
       this._east = undefined;
+      this.onResize && this.onResize();
     }
     return this._vector.subtract(vector, clone);
   };
@@ -184,6 +199,7 @@
       this._south = undefined;
       this._west = undefined;
       this._east = undefined;
+      this.onResize && this.onResize();
     }
     return this._vector.scale(factor, clone);
   };
@@ -194,6 +210,7 @@
       this._south = undefined;
       this._west = undefined;
       this._east = undefined;
+      this.onResize && this.onResize();
     }
     return this._vector.multiply(factor, clone);
   };
@@ -204,6 +221,7 @@
       this._south = undefined;
       this._west = undefined;
       this._east = undefined;
+      this.onResize && this.onResize();
     }
     return this._vector.divide(factor, clone);
   };

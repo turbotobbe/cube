@@ -19,7 +19,7 @@
    * @param [velocity] {object} The initial Velocity Vector.
    */
   _.Circle = function (x, y, radius, velocity, density) {
-    this._bounds = new _.bounds(x, y, radius * 2, radius * 2);
+    this._body = new _.body(x, y, radius * 2, radius * 2);
     this._radius = radius;
     this._velocity = velocity || new _.Vector(0, 0);
     this._density = density || 1;
@@ -29,16 +29,16 @@
   _.Circle.prototype = {
 
     get x() {
-      return this.bounds.x;
+      return this.body.x;
     },
     set x(value) {
-      this.bounds.x = value;
+      this.body.x = value;
     },
     get y() {
-      return this.bounds.y;
+      return this.body.y;
     },
     set y(value) {
-      this.bounds.y = value;
+      this.body.y = value;
     },
 
     get radius() {
@@ -47,8 +47,8 @@
     set radius(value) {
       if (this._radius !== value) {
         this._radius = value;
-        this.bounds.width = value * 2;
-        this.bounds.height = value * 2;
+        this.body.width = value * 2;
+        this.body.height = value * 2;
         this._area = undefined;
         this._mass = undefined;
       }
@@ -73,10 +73,10 @@
       }
     },
 
-    get bounds() {
-      return this._bounds;
+    get body() {
+      return this._body;
     },
-    set bounds(value) {
+    set body(value) {
       throw "Illegal Assignment";
     },
 
@@ -105,7 +105,7 @@
 
     clone: function () {
       var circle = _.circle();
-      circle._bounds = this._bounds.clone();
+      circle._body = this._body.clone();
       circle._radius = this._radius;
       circle._velocity = this._velocity.clone();
       circle._density = this._density;

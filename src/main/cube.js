@@ -4,35 +4,55 @@
 
 var CUBE = {};
 
-CUBE.extend = function(source, override) {
-  var proto = Object.create(source);
-  var _super = {};
-  var props = Object.getOwnPropertyNames(override);
-  for (var i=0; i<props.length; i++){
-    var name = props[i];
-    // get source desc if any and store in _super
-    var sourceDesc = Object.getOwnPropertyDescriptor(source, name);
-    if (sourceDesc !== undefined) {
-      Object.defineProperty(_super, name, sourceDesc);
-    }
-    // get override desc
-    var overrideDesc = Object.getOwnPropertyDescriptor(override, name);
-    if (sourceDesc) {
-      if (overrideDesc.set === undefined) {
-        overrideDesc.set = sourceDesc.set;
-      }
-      if (overrideDesc.get === undefined) {
-        overrideDesc.get = sourceDesc.get;
+CUBE.extend = function (sub, base, override) {
+
+  sub.prototype = Object.create(base.prototype);
+  sub.constructor = sub;
+
+  var baseProto = {};
+  var props = Object.getOwnPropertyNames(base.prototype);
+  for (var i = 0; i < props.length; i++) {
+    var propName = props[i];
+    var propDesc = Object.getOwnPropertyDescriptor(base.prototype, propName);
+    if (propDesc.set !== undefined) {
+      propDesc.set = function (value) {
+        Object.getOwnPropertyDescriptor(base.prototype, propName).set.call(this.me, value);
       }
     }
-    Object.defineProperty(proto, name, overrideDesc);
-    Object.defineProperty(proto, '_super', {
-      get: function() {
-        return _super;
+    if (propDesc.get !== undefined) {
+      propDesc.get = function () {
+        return Object.getOwnPropertyDescriptor(base.prototype, propName).get.call(this.me);
       }
-    });
+    }
+    Object.defineProperty(baseProto, propName, propDesc);
   }
-  return proto;
+
+  Object.defineProperty(sub.prototype, '__super', {
+    enumerable: true,
+    get: function() {
+      baseProto.me = this;
+      return baseProto;
+    }
+  });
+
+  if (override) {
+    var props = Object.getOwnPropertyNames(override);
+    for (var i = 0; i < props.length; i++) {
+      var propName = props[i];
+      var overridePropDesc = Object.getOwnPropertyDescriptor(override, propName);
+      var sourcePropDesc = Object.getOwnPropertyDescriptor(base.prototype, propName);
+      if (overridePropDesc.set === undefined && sourcePropDesc) {
+        overridePropDesc.set = sourcePropDesc.set;
+      }
+      if (overridePropDesc.get === undefined && sourcePropDesc) {
+        overridePropDesc.get = sourcePropDesc.get;
+      }
+      console.log([propName, overridePropDesc]);
+      Object.defineProperty(sub.prototype, propName, overridePropDesc);
+    }
+  }
+
+  return;
 };
 
 // CommonJS module

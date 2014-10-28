@@ -8,9 +8,34 @@
     _.Body.call(this, x, y, width, height, velocity, density);
   };
 
-  _.Rect.prototype = _.extend(_.Body.prototype, {
+  _.extend(_.Rect, _.Body, {
     set width(value) {
-      this._super.width = value;
+      this.__super.width = value;
+      this._area = undefined;
+      this._mass = undefined;
+    },
+    set height(value) {
+      this.__super.height = value;
+      this._area = undefined;
+      this._mass = undefined;
+    },
+    set north(value) {
+      this.__super.north = value;
+      this._area = undefined;
+      this._mass = undefined;
+    },
+    set south(value) {
+      this.__super.south = value;
+      this._area = undefined;
+      this._mass = undefined;
+    },
+    set west(value) {
+      this.__super.west = value;
+      this._area = undefined;
+      this._mass = undefined;
+    },
+    set east(value) {
+      this.__super.east = value;
       this._area = undefined;
       this._mass = undefined;
     }

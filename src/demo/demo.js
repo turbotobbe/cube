@@ -4,6 +4,13 @@
 
 (function (DEMO, _, $, undefined) {
 
+  var o = _.rect(1,1,1,1);
+  console.log(o.area());
+  o.width = 2;
+  console.log(o.area());
+  o.height = 2;
+  console.log(o.area());
+
   DEMO.games = {};
   DEMO.runs = [];
 
