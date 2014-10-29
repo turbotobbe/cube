@@ -1,8 +1,14 @@
-/**
- * @class Vector
- */
 (function (_, undefined) {
 
+  /**
+   * Create a new vector
+   *
+   * @static
+   * @method vector
+   * @param x {number} x coordinate.
+   * @param y {number} y coordinate.
+   * @returns {object} The vector
+   */
   _.vector = function (x, y) {
     return new _.Vector(x, y);
   };
@@ -49,14 +55,37 @@
         this._magnitude = undefined;
         this._normal = undefined;
       }
-    }
+    },
 
+    /**
+     * The magnitude (length)
+     * @property magnitude
+     * @type {number}
+     */
+    get magnitude() {
+      if (this._magnitude === undefined) {
+        this._magnitude = Math.sqrt((this.x * this.x) + (this.y * this.y));
+      }
+      return this._magnitude;
+    },
+
+    /**
+     * The normal vector (magnitude 1)
+     * @property normal
+     * @type {vector}
+     */
+    get normal() {
+      if (this._normal === undefined) {
+        this._normal = this.divide(this.magnitude, true);
+      }
+      return this._normal;
+    }
   };
 
   /**
    * Clone the vector
    * @method clone
-   * @returns {object} A cloned vector
+   * @returns {vector} A cloned vector
    */
   _.Vector.prototype.clone = function () {
     var obj = _.vector();
@@ -68,11 +97,11 @@
   };
 
   /**
-   * Negate the Vector.
+   * Negate the vector.
    *
-   * @method negate Negate this Vector
-   * @param [clone=false] {boolean} Clone a new vector
-   * @returns {object} This or a cloned vector.
+   * @method negate
+   * @param [clone=false] {boolean}
+   * @returns {vector}
    */
   _.Vector.prototype.negate = function (clone) {
     var obj = clone ? this.clone() : this;
@@ -81,6 +110,14 @@
     return obj;
   };
 
+  /**
+   * Add a vector to this vector.
+   *
+   * @method add
+   * @param vector {vector}
+   * @param [clone=false] {boolean}
+   * @returns {vector}
+   */
   _.Vector.prototype.add = function (vector, clone) {
     var obj = clone ? this.clone() : this;
     obj.x += vector.x;
@@ -88,6 +125,14 @@
     return obj;
   };
 
+  /**
+   * Subtract a vector from this vector.
+   *
+   * @method subtract
+   * @param vector {vector}
+   * @param [clone=false] {boolean}
+   * @returns {vector}
+   */
   _.Vector.prototype.subtract = function (vector, clone) {
     var obj = clone ? this.clone() : this;
     obj.x -= vector.x;
@@ -95,6 +140,14 @@
     return obj;
   };
 
+  /**
+   * Scale this vector with a factor.
+   *
+   * @method scale
+   * @param factor {number}
+   * @param [clone=false] {boolean}
+   * @returns {vector}
+   */
   _.Vector.prototype.scale = function (factor, clone) {
     var obj = clone ? this.clone() : this;
     obj.x *= factor;
@@ -102,6 +155,14 @@
     return obj;
   };
 
+  /**
+   * Multiply this vector with a factor.
+   *
+   * @method multiply
+   * @param factor {number}
+   * @param [clone=false] {boolean}
+   * @returns {vector}
+   */
   _.Vector.prototype.multiply = function (factor, clone) {
     var obj = clone ? this.clone() : this;
     obj.x *= factor;
@@ -109,6 +170,14 @@
     return obj;
   };
 
+  /**
+   * Divide this vector with a factor.
+   *
+   * @method divide
+   * @param factor {number}
+   * @param [clone=false] {boolean}
+   * @returns {vector}
+   */
   _.Vector.prototype.divide = function (factor, clone) {
     var obj = clone ? this.clone() : this;
     obj.x /= factor;
@@ -117,33 +186,23 @@
   };
 
   /**
-   * Get the magnitude (length)
-   * @method magnitude
-   * @returns {number}
+   * Calculate the dot product of this vector and another.
+   *
+   * @method dot
+   * @param vector {vector}
+   * @returns {vector}
    */
-  _.Vector.prototype.magnitude = function () {
-    if (this._magnitude === undefined) {
-      this._magnitude = Math.sqrt((this.x * this.x) + (this.y * this.y));
-    }
-    return this._magnitude;
-  };
-
-  /**
-   * Get the normal vector
-   * @method normal
-   * @returns {object}
-   */
-  _.Vector.prototype.normal = function () {
-    if (this._normal === undefined) {
-      this._normal = this.divide(this.magnitude, true);
-    }
-    return this._normal;
-  };
-
   _.Vector.prototype.dot = function (vector) {
     return (this.x * vector.x) + (this.y * vector.y);
   };
 
+  /**
+   * Calculate the cross product of this vector and another.
+   *
+   * @method cross
+   * @param vector {vector}
+   * @returns {vector}
+   */
   _.Vector.prototype.cross = function (vector) {
     return (this.x * vector.y) - (this.y * vector.x);
   };

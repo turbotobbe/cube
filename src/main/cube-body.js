@@ -1,8 +1,3 @@
-/**
- * The Body class
- *
- * @class Body
- */
 (function (_, undefined) {
 
   _.body = function (x, y, width, height, velocity, dencity) {
@@ -10,236 +5,199 @@
   };
 
   _.Body = function (x, y, width, height, velocity, density) {
-    this._vector = _.vector(x, y);
+    _.Vector.call(this, x, y);
     this._width = width;
     this._height = height;
+    this._north = x - (height/2);
+    this._south = x + (height/2);
+    this._west = y - (width/2);
+    this._east = y + (width/2);
     this.velocity = velocity || _.vector(0, 0);
     this.density = density || 1;
   };
 
-  _.Body.prototype = {
-
-    get x() {
-      if (this._vector.x === undefined) {
-        this._vector.x = this.west + ((this.east - this.west) / 2);
-      }
-      return this._vector.x;
-    },
+  _.extend(_.Body, _.Vector, {
     set x(value) {
-      if (this._vector.x !== value) {
-        this._vector.x = value;
-        this._west = this._vector.x - (this.width / 2);
-        this._east = this._vector.x + (this.width / 2);
-        this.onMove && this.onMove();
+      if (this.x !== value) {
+        this.__super.x = value;
+        this._west = value - (this.width/2);
+        this._east = value + (this.width/2);
       }
     },
 
-    get y() {
-      if (this._vector.y === undefined) {
-        this._vector.y = this._north + ((this.south - this.north) / 2);
-      }
-      return this._vector._y;
-    },
     set y(value) {
-      if (this._vector.y !== value) {
-        this._vector.y = value;
-        this._north = this._vector.y - (this.height / 2);
-        this._south = this._vector.y + (this.height / 2);
-        this.onMove && this.onMove();
+      if (this.y !== value) {
+        this.__super.y = value;
+        this._north = value - (this.height/2);
+        this._south = value + (this.height/2);
       }
     },
 
     get width() {
-      if (this._width === undefined) {
-        this._width = this.east - this_west;
-      }
       return this._width;
     },
     set width(value) {
       if (this._width !== value) {
         this._width = value;
-        this._west = this._vector.x - (this.width / 2);
-        this._east = this._vector.x + (this.width / 2);
-        this.onResize && this.onResize();
+        this._west = this.x - (value / 2);
+        this._east = this.x + (value / 2);
       }
     },
 
     get height() {
-      if (this._height === undefined) {
-        this._height = this._south - this._north;
-      }
       return this._height;
     },
     set height(value) {
       if (this._height !== value) {
         this._height = value;
-        this._north = this._vector.y - (this.height / 2);
-        this._south = this._vector.y + (this.height / 2);
-        this.onResize && this.onResize();
+        this._north = this.y - (value / 2);
+        this._south = this.y + (value / 2);
       }
     },
 
     get north() {
-      if (this._north === undefined) {
-        this._north = this._vector.y - (this.height / 2);
-      }
       return this._north;
     },
 
     set north(value) {
       if (this._north !== value) {
         this._north = value;
-        this._vector.y = this.north + ((this.south - this.north) / 2);
         this._height = this.south - this.north;
-        this.onResize && this.onResize();
-        this.onMove && this.onMove();
+        this.y = value - (this.height/2);
       }
     },
 
     get south() {
-      if (this._south === undefined) {
-        this._south = this._vector.y + (this.height / 2);
-      }
       return this._south;
     },
 
     set south(value) {
       if (this._south !== value) {
         this._south = value;
-        this._vector.y = this.north + ((this.south - this.north) / 2);
         this._height = this.south - this.north;
-        this.onResize && this.onResize();
-        this.onMove && this.onMove();
+        this.y = value - (this.height/2);
       }
     },
 
     get west() {
-      if (this._west === undefined) {
-        this._west = this._vector.x - (this._width / 2);
-      }
       return this._west;
     },
 
     set west(value) {
       if (this._west !== value) {
         this._west = value;
-        this._vector.x = this.west + ((this.east - this.west) / 2);
         this._width = this.east - this.west;
-        this.onResize && this.onResize();
-        this.onMove && this.onMove();
+        this.x = value - (this.width/2);
       }
     },
 
     get east() {
-      if (this._east === undefined) {
-        this._east = this._vector.x + (this._width / 2);
-      }
       return this._east;
     },
 
     set east(value) {
       if (this._east !== value) {
         this._east = value;
-        this._vector.x = this.west + ((this.east - this.west) / 2);
         this._width = this.east - this.west;
-        this.onResize && this.onResize();
-        this.onMove && this.onMove();
+        this.x = value - (this.width/2);
       }
+    },
+
+    negate: function (clone) {
+      var obj = undefined;
+      if (clone) {
+        obj = this.clone().negate();
+      } else {
+        this.superDo('negate');
+        this._north = this.y - (this.height/2);
+        this._south = this.y + (this.height/2);
+        this._west = this.x - (this.width/2);
+        this._east = this.x + (this.width/2);
+        obj = this;
+      }
+      return obj;
+    },
+
+    add: function (vector, clone) {
+      var obj = undefined;
+      if (clone) {
+        obj = this.clone().add(vector);
+      } else {
+        this.superDo('add', factor);
+        this._north = this.y - (this.height/2);
+        this._south = this.y + (this.height/2);
+        this._west = this.x - (this.width/2);
+        this._east = this.x + (this.width/2);
+        obj = this;
+      }
+      return obj;
+    },
+
+    subtract: function (vector, clone) {
+      var obj = undefined;
+      if (clone) {
+        obj = this.clone().subtract(vector);
+      } else {
+        this.superDo('subtract', factor);
+        this._north = this.y - (this.height/2);
+        this._south = this.y + (this.height/2);
+        this._west = this.x - (this.width/2);
+        this._east = this.x + (this.width/2);
+        obj = this;
+      }
+      return obj;
+    },
+
+    scale: function (factor, clone) {
+      var obj = undefined;
+      if (clone) {
+        obj = this.clone().scale(factor);
+      } else {
+        this.superDo('scale', factor);
+        this._north = this.y - (this.height/2);
+        this._south = this.y + (this.height/2);
+        this._west = this.x - (this.width/2);
+        this._east = this.x + (this.width/2);
+        obj = this;
+      }
+      return obj;
+    },
+
+    multiply: function (factor, clone) {
+      var obj = undefined;
+      if (clone) {
+        obj = this.clone().multiply(factor);
+      } else {
+        this.superDo('multiply', factor);
+        this._north = this.y - (this.height/2);
+        this._south = this.y + (this.height/2);
+        this._west = this.x - (this.width/2);
+        this._east = this.x + (this.width/2);
+        obj = this;
+      }
+      return obj;
+    },
+
+    divide: function (factor, clone) {
+      var obj = undefined;
+      if (clone) {
+        obj = this.clone().divide(factor);
+      } else {
+        this.superDo('divide', factor);
+        this.__super.divide(factor);
+        this._north = this.y - (this.height/2);
+        this._south = this.y + (this.height/2);
+        this._west = this.x - (this.width/2);
+        this._east = this.x + (this.width/2);
+        obj = this;
+      }
+      return obj;
     }
-  };
+
+  });
 
   _.Body.prototype.clone = function () {
-    var body = _.body();
-    body._vector = this._vector.clone();
-    body._height = this._height;
-    body._width = this._width;
-    body._north = this._north;
-    body._south = this._south;
-    body._west = this._west;
-    body._east = this._east;
-    return body;
-  };
-
-  _.Body.prototype.negate = function (clone) {
-    if (!clone) {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-      this.onResize && this.onResize();
-    }
-    return this._vector.negate(clone);
-  };
-
-  _.Body.prototype.add = function (vector, clone) {
-    if (!clone) {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-      this.onResize && this.onResize();
-    }
-    return this._vector.add(vector, clone);
-  };
-
-  _.Body.prototype.subtract = function (vector, clone) {
-    if (!clone) {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-      this.onResize && this.onResize();
-    }
-    return this._vector.subtract(vector, clone);
-  };
-
-  _.Body.prototype.scale = function (factor, clone) {
-    if (!clone) {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-      this.onResize && this.onResize();
-    }
-    return this._vector.scale(factor, clone);
-  };
-
-  _.Body.prototype.multiply = function (factor, clone) {
-    if (!clone) {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-      this.onResize && this.onResize();
-    }
-    return this._vector.multiply(factor, clone);
-  };
-
-  _.Body.prototype.divide = function (factor, clone) {
-    if (!clone) {
-      this._north = undefined;
-      this._south = undefined;
-      this._west = undefined;
-      this._east = undefined;
-      this.onResize && this.onResize();
-    }
-    return this._vector.divide(factor, clone);
-  };
-
-  _.Body.prototype.magnitude = function () {
-    return this._vector.magnitude();
-  };
-
-  _.Body.prototype.normal = function (vector) {
-    return this._vector.normal();
-  };
-
-  _.Body.prototype.dot = function (vector) {
-    return this._vector.dot(vector);
-  };
-
-  _.Body.prototype.cross = function (vector) {
-    return this._vector.cross(vector);
+    return _.body(this.x, this.y, this.width, this.height, this.velocity.clone(), this.density);
   };
 
   /**

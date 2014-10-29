@@ -10,7 +10,7 @@ module.exports = function (grunt) {
     },
     concat: {
       main: {
-        src: ['src/main/cube.js', 'src/main/cube-*.js'],
+        src: ['src/main/cube.js', 'src/main/cube-vector.js', 'src/main/cube-*.js'],
         dest: 'target/<%= rel.name %>.js'
       },
       demo: {
@@ -54,6 +54,9 @@ module.exports = function (grunt) {
         filter: 'isFile',
       }
     },
+    nodeunit: {
+      main: ['src/test/test-*.js']
+    },
     yuidoc: {
       compile: {
         name: '<%= rel.name %>.js Physics Engine API Documentation',
@@ -73,9 +76,11 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
 
 //grunt.registerTask('clear', ['clean']);
+  grunt.registerTask('test', ['concat', 'uglify', 'copy:main', 'nodeunit:main']);
   grunt.registerTask('default', ['concat', 'uglify', 'copy:main', 'copy:demo', 'yuidoc']);
   grunt.registerTask('demo', ['concat', 'uglify', 'copy:main', 'copy:demo']);
   grunt.registerTask('release', ['clean', 'concat:main', 'uglify:main', 'copy:dist']);

@@ -45,6 +45,7 @@
     var obj = _.Body.clone.call(this);
     obj._area = this._area;
     obj._mass = this._mass;
+    return obj;
   };
 
   _.Rect.prototype.area = function() {
