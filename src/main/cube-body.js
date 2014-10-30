@@ -1,37 +1,43 @@
 (function (_, undefined) {
 
-  _.body = function (x, y, width, height, velocity, dencity) {
-    return new _.Body(x, y, width, height, velocity, dencity);
+  /**
+   * Create a new body
+   *
+   * @static
+   * @method body
+   * @param x {number} x coordinate.
+   * @param y {number} y coordinate.
+   * @returns {object} The body
+   */
+  _.body = function (x, y, width, height, velocity, density) {
+    return new _.Body(x, y, width, height, velocity, density);
   };
 
+  /**
+   * @class Body
+   * @constructor
+   * @param x {number} x coordinate.
+   * @param y {number} y coordinate.
+   * @param width {number} body width
+   * @param height {number} body height
+   * @param [velocity={0,0}] {vector} body velosity
+   * @param [density=0] {number} body density
+   */
   _.Body = function (x, y, width, height, velocity, density) {
-    _.Vector.call(this, x, y);
+    this._center = _.vector(x, y);
     this._width = width;
     this._height = height;
-    this._north = x - (height/2);
-    this._south = x + (height/2);
-    this._west = y - (width/2);
-    this._east = y + (width/2);
-    this.velocity = velocity || _.vector(0, 0);
-    this.density = density || 1;
+    var h2 = this._height / 2;
+    var w2 = this._width / 2;
+    this._box = _.box(y - h2, y + h2, x - w2, x + w2);
+    this._velocity = velocity ? velocity.clone() : _.vector(0,0);
+    this._density = density || 1;
+
+    this._box.observe(this, _.Body.prototype.observeBox);
+    this._center.observe(this, _.Body.prototype.observeCenter);
   };
 
-  _.extend(_.Body, _.Vector, {
-    set x(value) {
-      if (this.x !== value) {
-        this.__super.x = value;
-        this._west = value - (this.width/2);
-        this._east = value + (this.width/2);
-      }
-    },
-
-    set y(value) {
-      if (this.y !== value) {
-        this.__super.y = value;
-        this._north = value - (this.height/2);
-        this._south = value + (this.height/2);
-      }
-    },
+  _.Body.prototype = {
 
     get width() {
       return this._width;
@@ -39,8 +45,8 @@
     set width(value) {
       if (this._width !== value) {
         this._width = value;
-        this._west = this.x - (value / 2);
-        this._east = this.x + (value / 2);
+        this.box.west = this.center.x - (this._width/2);
+        this.box.east = this.center.x + (this._width/2);
       }
     },
 
@@ -50,154 +56,53 @@
     set height(value) {
       if (this._height !== value) {
         this._height = value;
-        this._north = this.y - (value / 2);
-        this._south = this.y + (value / 2);
+        this.box.north = this.center.y - (this._height/2);
+        this.box.south = this.center.y + (this._height/2);
       }
     },
 
-    get north() {
-      return this._north;
+    get center() {
+      return this._center;
     },
 
-    set north(value) {
-      if (this._north !== value) {
-        this._north = value;
-        this._height = this.south - this.north;
-        this.y = value - (this.height/2);
-      }
-    },
-
-    get south() {
-      return this._south;
-    },
-
-    set south(value) {
-      if (this._south !== value) {
-        this._south = value;
-        this._height = this.south - this.north;
-        this.y = value - (this.height/2);
-      }
-    },
-
-    get west() {
-      return this._west;
-    },
-
-    set west(value) {
-      if (this._west !== value) {
-        this._west = value;
-        this._width = this.east - this.west;
-        this.x = value - (this.width/2);
-      }
-    },
-
-    get east() {
-      return this._east;
-    },
-
-    set east(value) {
-      if (this._east !== value) {
-        this._east = value;
-        this._width = this.east - this.west;
-        this.x = value - (this.width/2);
-      }
-    },
-
-    negate: function (clone) {
-      var obj = undefined;
-      if (clone) {
-        obj = this.clone().negate();
-      } else {
-        this.superDo('negate');
-        this._north = this.y - (this.height/2);
-        this._south = this.y + (this.height/2);
-        this._west = this.x - (this.width/2);
-        this._east = this.x + (this.width/2);
-        obj = this;
-      }
-      return obj;
-    },
-
-    add: function (vector, clone) {
-      var obj = undefined;
-      if (clone) {
-        obj = this.clone().add(vector);
-      } else {
-        this.superDo('add', factor);
-        this._north = this.y - (this.height/2);
-        this._south = this.y + (this.height/2);
-        this._west = this.x - (this.width/2);
-        this._east = this.x + (this.width/2);
-        obj = this;
-      }
-      return obj;
-    },
-
-    subtract: function (vector, clone) {
-      var obj = undefined;
-      if (clone) {
-        obj = this.clone().subtract(vector);
-      } else {
-        this.superDo('subtract', factor);
-        this._north = this.y - (this.height/2);
-        this._south = this.y + (this.height/2);
-        this._west = this.x - (this.width/2);
-        this._east = this.x + (this.width/2);
-        obj = this;
-      }
-      return obj;
-    },
-
-    scale: function (factor, clone) {
-      var obj = undefined;
-      if (clone) {
-        obj = this.clone().scale(factor);
-      } else {
-        this.superDo('scale', factor);
-        this._north = this.y - (this.height/2);
-        this._south = this.y + (this.height/2);
-        this._west = this.x - (this.width/2);
-        this._east = this.x + (this.width/2);
-        obj = this;
-      }
-      return obj;
-    },
-
-    multiply: function (factor, clone) {
-      var obj = undefined;
-      if (clone) {
-        obj = this.clone().multiply(factor);
-      } else {
-        this.superDo('multiply', factor);
-        this._north = this.y - (this.height/2);
-        this._south = this.y + (this.height/2);
-        this._west = this.x - (this.width/2);
-        this._east = this.x + (this.width/2);
-        obj = this;
-      }
-      return obj;
-    },
-
-    divide: function (factor, clone) {
-      var obj = undefined;
-      if (clone) {
-        obj = this.clone().divide(factor);
-      } else {
-        this.superDo('divide', factor);
-        this.__super.divide(factor);
-        this._north = this.y - (this.height/2);
-        this._south = this.y + (this.height/2);
-        this._west = this.x - (this.width/2);
-        this._east = this.x + (this.width/2);
-        obj = this;
-      }
-      return obj;
+    get box() {
+      return this._box;
     }
+  };
 
-  });
-
+  /**
+   * Clone the body
+   * @method clone
+   * @returns {body} A cloned body
+   */
   _.Body.prototype.clone = function () {
-    return _.body(this.x, this.y, this.width, this.height, this.velocity.clone(), this.density);
+    return _.body(this.center.x, this.center.y, this.width, this.height, this.velocity, this.density);
+  };
+
+  _.Body.prototype.observeCenter = function (name) {
+    if (name === _.Vector.X) {
+      this.box.west = this.center.x - (this.width / 2);
+      this.box.east = this.center.x + (this.width / 2);
+    } else if (name === _.Vector.Y) {
+      this.box.north = this.center.y - (this.height / 2);
+      this.box.south = this.center.y + (this.height / 2);
+    }
+  };
+
+  _.Body.prototype.observeBox = function (name) {
+    if (name === _.Box.NORTH) {
+      this.height = this.box.south - this.box.north;
+      this.center.y = this.box.north + (this.height / 2);
+    } else if (name === _.Box.SOUTH) {
+      this.height = this.box.south - this.box.north;
+      this.center.y = this.box.north + (this.height / 2);
+    } else if (name === _.Box.WEST) {
+      this.width = this.box.east - this.box.west;
+      this.center.x = this.box.west + (this.width / 2);
+    } else if (name === _.Box.EAST) {
+      this.width = this.box.east - this.box.west;
+      this.center.x = this.box.west + (this.width / 2);
+    }
   };
 
   /**

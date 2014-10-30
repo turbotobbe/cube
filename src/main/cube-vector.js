@@ -24,6 +24,9 @@
     this._y = y;
   };
 
+  _.Vector.X = 'x';
+  _.Vector.Y = 'y';
+
   _.Vector.prototype = {
     /**
      * The x coordinate
@@ -38,6 +41,7 @@
         this._x = value;
         this._magnitude = undefined;
         this._normal = undefined;
+        this.notify(_.Vector.X);
       }
     },
 
@@ -54,6 +58,7 @@
         this._y = value;
         this._magnitude = undefined;
         this._normal = undefined;
+        this.notify(_.Vector.Y);
       }
     },
 
@@ -88,9 +93,7 @@
    * @returns {vector} A cloned vector
    */
   _.Vector.prototype.clone = function () {
-    var obj = _.vector();
-    obj._x = this._x;
-    obj._y = this._y;
+    var obj = _.vector(this.x, this.y);
     obj._magnitude = this._magnitude;
     obj._normal = this._normal;
     return obj;

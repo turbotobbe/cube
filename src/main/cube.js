@@ -4,9 +4,28 @@
 
 var CUBE = {};
 
+Object.prototype.observe = function(observer, callback) {
+  //console.log(['observe',callback]);
+  this._observers = this._observers || [];
+  this._observers.push({
+    observer: observer,
+    callback: callback
+  });
+};
+
+Object.prototype.notify = function(name) {
+  //console.log(['notify', name]);
+  if (this._observers) {
+    for (var i=0; i<this._observers.length; i++) {
+      var observer = this._observers[i];
+      observer.callback.call(observer.observer, name);
+    }
+  }
+};
+
 CUBE.extend = function (sub, base, override) {
 
-  console.log(['extend', sub, base]);
+  //console.log(['extend', sub, base]);
   sub.prototype = Object.create(base.prototype);
   sub.constructor = sub;
 /*
@@ -58,11 +77,16 @@ CUBE.extend = function (sub, base, override) {
       if (overridePropDesc.get === undefined && sourcePropDesc && sourcePropDesc.get) {
         overridePropDesc.get = sourcePropDesc.get;
       }
-      console.log([propName, overridePropDesc]);
+      //console.log([propName, overridePropDesc]);
       Object.defineProperty(sub.prototype, propName, overridePropDesc);
     }
   }
-
+  Object.defineProperty(sub.prototype, '_super', {
+    get: function() {
+      return base;
+    }
+  });
+/*
   sub.prototype.superDo = function(propName) {
     var desc = Object.getOwnPropertyDescriptor(base.prototype, propName);
     console.log(['do', arguments, desc]);
@@ -75,6 +99,7 @@ CUBE.extend = function (sub, base, override) {
     }
   }
   return;
+  */
 };
 
 // CommonJS module
