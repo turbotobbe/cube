@@ -25,11 +25,9 @@
    */
   _.Body = function (x, y, width, height, velocity, density) {
     this._center = _.vector(x, y);
-    this._width = width;
-    this._height = height;
-    var h2 = this._height / 2;
-    var w2 = this._width / 2;
-    this._box = _.box(y - h2, y + h2, x - w2, x + w2);
+    var diffWidth = width / 2;
+    var diffHeight = height / 2;
+    this._box = _.box(x - diffWidth, x + diffWidth, y - diffHeight, y + diffHeight);
     this._velocity = velocity ? velocity.clone() : _.vector(0,0);
     this._density = density || 1;
 
@@ -38,28 +36,6 @@
   };
 
   _.Body.prototype = {
-
-    get width() {
-      return this._width;
-    },
-    set width(value) {
-      if (this._width !== value) {
-        this._width = value;
-        this.box.west = this.center.x - (this._width/2);
-        this.box.east = this.center.x + (this._width/2);
-      }
-    },
-
-    get height() {
-      return this._height;
-    },
-    set height(value) {
-      if (this._height !== value) {
-        this._height = value;
-        this.box.north = this.center.y - (this._height/2);
-        this.box.south = this.center.y + (this._height/2);
-      }
-    },
 
     get center() {
       return this._center;
@@ -81,60 +57,26 @@
 
   _.Body.prototype.observeCenter = function (name) {
     if (name === _.Vector.X) {
-      this.box.west = this.center.x - (this.width / 2);
-      this.box.east = this.center.x + (this.width / 2);
+      var diffWidth = this.box.width / 2;
+      this.box.west = this.center.x - diffWidth;
+      this.box.east = this.center.x + diffWidth;
     } else if (name === _.Vector.Y) {
-      this.box.north = this.center.y - (this.height / 2);
-      this.box.south = this.center.y + (this.height / 2);
+      var diffHeight = this.box.height / 2
+      this.box.north = this.center.y - diffHeight;
+      this.box.south = this.center.y + diffHeight;
     }
   };
 
   _.Body.prototype.observeBox = function (name) {
-    if (name === _.Box.NORTH) {
-      this.height = this.box.south - this.box.north;
-      this.center.y = this.box.north + (this.height / 2);
-    } else if (name === _.Box.SOUTH) {
-      this.height = this.box.south - this.box.north;
-      this.center.y = this.box.north + (this.height / 2);
-    } else if (name === _.Box.WEST) {
-      this.width = this.box.east - this.box.west;
-      this.center.x = this.box.west + (this.width / 2);
+    if (name === _.Box.WEST) {
+      this.center.x = this.box.west + (this.box.width / 2);
     } else if (name === _.Box.EAST) {
-      this.width = this.box.east - this.box.west;
-      this.center.x = this.box.west + (this.width / 2);
+      this.center.x = this.box.west + (this.box.width / 2);
+    } else if (name === _.Box.NORTH) {
+      this.center.y = this.box.north + (this.box.height / 2);
+    } else if (name === _.Box.SOUTH) {
+      this.center.y = this.box.north + (this.box.height / 2);
     }
-  };
-
-  /**
-   * Check if this body covers another body
-   * @method covers
-   * @param {object} body
-   * @returns true if this body covers body, false otherwise
-   */
-  _.Body.prototype.covers = function (body) {
-    if (this.north > body.north) {
-      return false;
-    } else if (this.south < body.south) {
-      return false;
-    } else if (this.west > body.west) {
-      return false;
-    } else if (this.east < body.east) {
-      return false;
-    }
-    return true;
-  };
-
-  _.Body.prototype.intersects = function (body) {
-    if (this.north > body.south) {
-      return false;
-    } else if (this.south < body.north) {
-      return false;
-    } else if (this.west > body.east) {
-      return false;
-    } else if (this.east < body.west) {
-      return false;
-    }
-    return true;
   };
 
 }(CUBE));
