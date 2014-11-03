@@ -22,7 +22,8 @@ function assertVector(test, vector, x, y) {
   test.equal(vector.normal.y, normalY, 'vector.normal.y = ' + normalY);
 };
 
-module.exports = {
+module.exports = {};
+var x ={
   basic: function(test) {
     var b = CUBE.body(100, 200, 10, 20);
     assertBox(test, b.box, 95, 105, 190, 210);
