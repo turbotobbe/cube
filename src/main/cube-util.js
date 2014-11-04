@@ -14,6 +14,12 @@
     _.SOUTH = 'south';
     _.WIDTH = "width";
     _.HEIGHT = "height";
+    _.RADIUS = "radius";
+    _.VELOCITY = "velocity";
+    _.DENSITY = "density";
+    _.AREA = "area";
+    _.VOLUME = "volume";
+    _.MASS = "mass";
 
     /**
      * Generates a random number between min and max.

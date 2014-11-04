@@ -26,21 +26,22 @@
      */
     _.Body = function (x, y, width, height, velocity) {
         this._box = _.box(x, y, width, height);
-        this._center = _.vector(x + (width / 2), y + (height / 2));
         this._velocity = velocity ? velocity.clone() : _.vector(0, 0);
-
-        this._box.observe(this, _.Body.prototype.observeBox);
-        this._center.observe(this, _.Body.prototype.observeCenter);
     };
 
     _.Body.prototype = {
 
-        get center() {
-            return this._center;
-        },
-
         get box() {
             return this._box;
+        },
+        get velocity() {
+            return this._velocity;
+        },
+        set velocity(value) {
+            if (this._velocity != value) {
+                this._velocity = value;
+                this.notify([_.VELOCITY]);
+            }
         }
     };
 
@@ -52,7 +53,7 @@
     _.Body.prototype.clone = function () {
         return _.body(this.box.x, this.box.y, this.box.width, this.box.height, this.velocity);
     };
-
+/*
     _.Body.prototype.observeCenter = function (name) {
         if (name === _.X) {
             this.box.x = this.center.x - (this.box.width / 2);
@@ -68,5 +69,5 @@
             this.center.y = this.box.y + (this.box.height / 2);
         }
     };
-
+*/
 }(CUBE));

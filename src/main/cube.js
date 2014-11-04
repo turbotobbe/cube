@@ -13,12 +13,12 @@ Object.prototype.observe = function (observer, callback) {
     });
 };
 
-Object.prototype.notify = function (name) {
-    //console.log(['notify', name]);
+Object.prototype.notify = function (names) {
+    //console.log(['notify', names]);
     if (this._observers) {
         for (var i = 0; i < this._observers.length; i++) {
             var observer = this._observers[i];
-            observer.callback.call(observer.observer, name);
+            observer.callback.call(observer.observer, names);
         }
     }
 };

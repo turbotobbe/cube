@@ -49,6 +49,7 @@
                 this._x = value;
                 this._west = value;
                 this._east = value + this._width;
+                this.notify([_.X,_.WEST,_.EAST]);
             }
         },
 
@@ -65,6 +66,7 @@
                 this._y = value;
                 this._north = value;
                 this._south = this._north + this._height;
+                this.notify([_.Y,_.NORTH,_.SOUTH]);
             }
         },
 
@@ -80,6 +82,7 @@
             if (this._width !== value) {
                 this._width = value;
                 this._east = this._west + this._width;
+                this.notify([_.WIDTH, _.EAST]);
             }
         },
 
@@ -95,6 +98,7 @@
             if (this._height !== value) {
                 this._height = value;
                 this._south = this._north + this._height;
+                this.notify([_.HEIGHT,_.SOUTH]);
             }
         },
 
@@ -111,6 +115,7 @@
                 this._west = value;
                 this._x = value;
                 this._width = this._east - this._west;
+                this.notify([_.WEST,_.X,_.WIDTH]);
             }
         },
 
@@ -126,6 +131,7 @@
             if (this._east !== value) {
                 this._east = value;
                 this._width = this._east - this._west;
+                this.notify([_.EAST,_.WIDTH]);
             }
         },
 
@@ -142,6 +148,7 @@
                 this._north = value;
                 this._y = value;
                 this._height = this._south - this._north;
+                this.notify([_.NORTH,_.Y,_.HEIGHT]);
             }
         },
 
@@ -157,6 +164,7 @@
             if (this._south !== value) {
                 this._south = value;
                 this._height = this._south - this._north;
+                this.notify([_.SOUTH,_.HEIGHT]);
             }
         }
     };

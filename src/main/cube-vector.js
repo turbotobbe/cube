@@ -38,7 +38,7 @@
                 this._x = value;
                 this._magnitude = undefined;
                 this._normal = undefined;
-                this.notify(_.Vector.X);
+                this.notify([_.X]);
             }
         },
 
@@ -55,7 +55,7 @@
                 this._y = value;
                 this._magnitude = undefined;
                 this._normal = undefined;
-                this.notify(_.Vector.Y);
+                this.notify([_.Y]);
             }
         },
 
