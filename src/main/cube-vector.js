@@ -22,6 +22,8 @@
     _.Vector = function (x, y) {
         this._x = x;
         this._y = y;
+        this._magnitude = undefined;
+        this._normal = undefined;
     };
 
     _.Vector.prototype = {
@@ -38,7 +40,6 @@
                 this._x = value;
                 this._magnitude = undefined;
                 this._normal = undefined;
-                this.notify([_.X]);
             }
         },
 
@@ -55,7 +56,6 @@
                 this._y = value;
                 this._magnitude = undefined;
                 this._normal = undefined;
-                this.notify([_.Y]);
             }
         },
 
@@ -92,7 +92,7 @@
     _.Vector.prototype.clone = function () {
         var obj = _.vector(this.x, this.y);
         obj._magnitude = this._magnitude;
-        obj._normal = this._normal;
+        obj._normal = this._normal ? this._normal.clone() : undefined;
         return obj;
     };
 

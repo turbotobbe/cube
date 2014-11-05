@@ -43,19 +43,6 @@ module.exports = {
         test.done();
     },
 
-    wens: function (test) {
-        var b = CUBE.box(10, 10, 20, 20);
-        b.west = 5;
-        assertProp(test, b, {x: 5, y: 10, width: 25, height: 20, west: 5, east: 30, north: 10, south: 30});
-        b.east = 35;
-        assertProp(test, b, {x: 5, y: 10, width: 30, height: 20, west: 5, east: 35, north: 10, south: 30});
-        b.north = 5;
-        assertProp(test, b, {x: 5, y: 5, width: 30, height: 25, west: 5, east: 35, north: 5, south: 30});
-        b.south = 35;
-        assertProp(test, b, {x: 5, y: 5, width: 30, height: 30, west: 5, east: 35, north: 5, south: 35});
-        test.done();
-    },
-
     coversTrue: function (test) {
 
         assertCovers(test, {x: 0, y: 0, width: 10, height: 10}, {x: 0, y: 0, width: 10, height: 10}, true);

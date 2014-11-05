@@ -1,12 +1,7 @@
-/**
- * The Rect class
- *
- * @class Rect
- */
 (function (_, undefined) {
 
-    _.rect = function (x, y, width, height, velocity, density) {
-        return new _.Rect(x, y, width, height, velocity, density);
+    _.rect = function (x, y, width, height, vx, vy, density) {
+        return new _.Rect(x, y, width, height, vx, vy, density);
     };
 
     /**
@@ -18,28 +13,36 @@
      * @param y {number} y coordinate (center).
      * @param width {number} The initial width
      * @param height {number} The initial height.
-     * @param [velocity] {vector} The initial Velocity Vector.
-     * @param [dencity] {number} The density.
+     * @param [cx=0] {number} The initial Velocity x.
+     * @param [cy=0] {number} The initial Velocity y.
+     * @param [density=1] {number} The density.
      */
-    _.Rect = function (x, y, width, height, velocity, density) {
-        this._body = _.body(x, y, width, height, velocity);
-        this._anchor = _.vector(x,y);
+    _.Rect = function (x, y, width, height, vx, vy, density) {
+        _.Vector.call(this, x, y);
         this._width = width;
         this._height = height;
+        this._velocity = _.vector(vx || 0, vy || 0);
+        this._box = _.box(x, y, width, height);
         this._density = density || 1;
-        // area mass
-
-        this._body.box.observe(this, _.Rect.prototype.observeBodyBox);
-        this._anchor.observe(this, _.Rect.prototype.observeAnchor);
+        this._area = undefined;
+        this._volume = undefined;
+        this._mass = undefined;
     };
+    _.Rect.prototype = Object.create(_.Vector.prototype);
+    _.Rect.constructor = _.Vector;
 
     _.Rect.prototype = {
-
-        get body() {
-            return this._body;
+        set x(value) {
+            if (this._x !== value) {
+                this._x = value;
+                this.box.x = this.x;
+            }
         },
-        get anchor() {
-            return this._anchor;
+        set y(value) {
+            if (this._y !== value) {
+                this._y = value;
+                this.box.y = this.y;
+            }
         },
         get width() {
             return this._width;
@@ -47,11 +50,10 @@
         set width(value) {
             if (this._width !== value) {
                 this._width = value;
-                this.body.box.width = this.width;
+                this.box.width = this.width;
                 this._area = undefined;
                 this._volume = undefined;
                 this._mass = undefined;
-                this.notify([_.WIDTH, _.AREA, _.VOLUME, _.MASS]);
             }
         },
         get height() {
@@ -60,14 +62,20 @@
         set height(value) {
             if (this._height !== value) {
                 this._height = value;
-                this.body.box.height = this.height;
+                this.box.height = this.height;
                 this._area = undefined;
                 this._volume = undefined;
                 this._mass = undefined;
-                this.notify([_.HEIGHT, _.AREA, _.VOLUME, _.MASS]);
             }
         },
-
+        get velocity() {
+            return this._velocity;
+        },
+        set velocity(value) {
+            if (this._velocity !== value) {
+                this._velocity = value;
+            }
+        },
         get density() {
             return this._density;
         },
@@ -75,24 +83,21 @@
             if (this._density !== value) {
                 this._density = value;
                 this._mass = undefined;
-                this.notify([_.DENSITY, _.MASS]);
             }
         },
-
         get area() {
             if (this._area === undefined) {
-                this._area = Math.PI * this.radius * this.radius;
+                this._area = this.width * this.height;
             }
             return this._area;
         },
-
         get volume() {
             if (this._volume === undefined) {
-                this._volume = this.area * this.radius * 4 / 3;
+                // could be some other depth [min(abs(width),abs(height))+abs(width-height)]
+                this._volume = this.area * 1;
             }
             return this._volume;
         },
-
         get mass() {
             if (this._mass === undefined) {
                 // this is mass for a sphere.
@@ -104,7 +109,7 @@
     };
 
     _.Rect.prototype.clone = function () {
-        var rect = _.rect(this.body.x, this.body.y, this.width, this.height, this.body.velocity, this.density);
+        var rect = _.rect(this.x, this.y, this.width, this.height, this.velocity.x, this.velocity.y, this.density);
         rect._area = this._area;
         rect._volume = this._volume;
         rect._mass = this._mass;
@@ -116,31 +121,5 @@
         this.width *= scalar;
         rect.height *= scalar;
         return rect;
-    };
-
-    _.Rect.prototype.observeBodyBox = function (name) {
-        if (_.X === name) {
-            this.anchor.x = this.body.box.x;
-        } else if (_.Y === name) {
-            this.anchor.y = this.body.box.y;
-        } else if ([_.WIDTH, _.EAST, _.WEST].contains(name)) {
-            this._width = this.body.box.width;
-            this._area = undefined;
-            this._volume = undefined;
-            this._mass = undefined;
-        } else if ([_.HEIGHT, _.NORTH, _.SOUTH].contains(name)) {
-            this._width = this.body.box.width;
-            this._area = undefined;
-            this._volume = undefined;
-            this._mass = undefined;
-        }
-    };
-
-    _.Rect.prototype.observeAnchor = function (name) {
-        if (_.X === name) {
-            this._body.box.x = this.anchor.x;
-        } else if (_.Y === name) {
-            this._body.box.y = this.anchor.y;
-        }
     };
 }(CUBE));

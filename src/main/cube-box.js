@@ -28,10 +28,8 @@
         this._y = y;
         this._width = width;
         this._height = height;
-        this._west = this._x;
-        this._north = this._y;
-        this._east = this._west + this._width;
-        this._south = this._north + this._height;
+        this._east = this._x + this._width;
+        this._south = this._y + this._height;
     };
 
     _.Box.prototype = {
@@ -47,9 +45,7 @@
         set x(value) {
             if (this._x !== value) {
                 this._x = value;
-                this._west = value;
-                this._east = value + this._width;
-                this.notify([_.X,_.WEST,_.EAST]);
+                this._east = this.x + this.width;
             }
         },
 
@@ -64,9 +60,7 @@
         set y(value) {
             if (this._y !== value) {
                 this._y = value;
-                this._north = value;
-                this._south = this._north + this._height;
-                this.notify([_.Y,_.NORTH,_.SOUTH]);
+                this._south = this.y + this.height;
             }
         },
 
@@ -81,8 +75,7 @@
         set width(value) {
             if (this._width !== value) {
                 this._width = value;
-                this._east = this._west + this._width;
-                this.notify([_.WIDTH, _.EAST]);
+                this._east = this.x + this.width;
             }
         },
 
@@ -97,75 +90,44 @@
         set height(value) {
             if (this._height !== value) {
                 this._height = value;
-                this._south = this._north + this._height;
-                this.notify([_.HEIGHT,_.SOUTH]);
+                this._south = this.y + this.height;
             }
         },
 
         /**
-         * When set, the box is resized
+         * Western border
          * @property west
          * @type {number}
          */
         get west() {
-            return this._west;
-        },
-        set west(value) {
-            if (this._west !== value) {
-                this._west = value;
-                this._x = value;
-                this._width = this._east - this._west;
-                this.notify([_.WEST,_.X,_.WIDTH]);
-            }
+            return this._x;
         },
 
         /**
-         * When set, the box is resized
+         * Eastern border
          * @property east
          * @type {number}
          */
         get east() {
             return this._east;
         },
-        set east(value) {
-            if (this._east !== value) {
-                this._east = value;
-                this._width = this._east - this._west;
-                this.notify([_.EAST,_.WIDTH]);
-            }
-        },
 
         /**
-         * When set, the box is resized
+         * Northern border
          * @property north
          * @type {number}
          */
         get north() {
-            return this._north;
-        },
-        set north(value) {
-            if (this._north !== value) {
-                this._north = value;
-                this._y = value;
-                this._height = this._south - this._north;
-                this.notify([_.NORTH,_.Y,_.HEIGHT]);
-            }
+            return this._y;
         },
 
         /**
-         * When set, the box is resized
+         * Sothern border
          * @property south
          * @type {number}
          */
         get south() {
             return this._south;
-        },
-        set south(value) {
-            if (this._south !== value) {
-                this._south = value;
-                this._height = this._south - this._north;
-                this.notify([_.SOUTH,_.HEIGHT]);
-            }
         }
     };
 
@@ -175,8 +137,7 @@
      * @returns {box} A cloned box
      */
     _.Box.prototype.clone = function () {
-        var obj = _.box(this.x, this.y, this.width, this.height);
-        return obj;
+        return _.box(this.x, this.y, this.width, this.height);
     };
 
     /**
