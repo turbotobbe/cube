@@ -1,12 +1,16 @@
 module.exports = function (grunt) {
 
+    function stripVersion(dest, src) {
+        return dest + src.replace(/-[0-9]+\.[0-9]+\.[0-9]+/, '');
+    };
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         rel: {
             name: '<%= pkg.name %>-<%= pkg.version %>'
         },
         clean: {
-            src: ['target', 'demo/js/<%= rel.name %>.min.js', 'demo/js/<%= rel.name %>-demo.min.js']
+            src: ['target']
         },
         concat: {
             main: {
@@ -26,32 +30,52 @@ module.exports = function (grunt) {
                 files: {
                     'target/<%= rel.name %>.min.js': ['<%= concat.main.dest %>']
                 }
-            },
+            }
+        },
+        less: {
             demo: {
-                options: {
-                    banner: '/*! <%= rel.name %>-demo <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-                },
                 files: {
-                    'target/<%= rel.name %>-demo.min.js': ['<%= concat.demo.dest %>']
+                    "target/<%= rel.name %>-demo.css": "src/demo/**.less"
                 }
             }
         },
         copy: {
-            main: {
-                src: 'target/<%= rel.name %>.js',
-                dest: 'demo/js/<%= rel.name %>.js'
-            },
             demo: {
-                src: 'target/<%= rel.name %>-demo.js',
-                dest: 'demo/js/<%= rel.name %>-demo.js'
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'src/demo/',
+                        src: ['**.html'],
+                        dest: 'target/demo/'
+                    },
+                    {
+                        expand: true,
+                        src: ['target/<%= rel.name %>.js'],
+                        dest: 'target/demo/js/',
+                        flatten: true,
+                        rename: stripVersion
+                    },
+                    {
+                        expand: true,
+                        src: ['target/<%= rel.name %>-demo.js'],
+                        dest: 'target/demo/js/',
+                        flatten: true,
+                        rename: stripVersion
+                    },
+                    {
+                        expand: true,
+                        src: ['target/<%= rel.name %>-demo.css'],
+                        dest: 'target/demo/css/',
+                        flatten: true,
+                        rename: stripVersion
+                    }
+                ]
             },
             dist: {
                 expand: true,
-                cwd: 'target/',
-                src: ['<%= rel.name %>.js', '<%= rel.name %>.min.js'],
+                src: ['target/<%= rel.name %>.js', 'target/<%= rel.name %>.min.js'],
                 dest: 'dist/',
-                flatten: true,
-                filter: 'isFile',
+                flatten: true
             }
         },
         nodeunit: {
@@ -72,6 +96,7 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -82,7 +107,7 @@ module.exports = function (grunt) {
 //grunt.registerTask('clear', ['clean']);
     grunt.registerTask('test', ['concat', 'uglify', 'copy:main', 'nodeunit:main']);
     grunt.registerTask('default', ['concat', 'uglify', 'copy:main', 'copy:demo', 'yuidoc']);
-    grunt.registerTask('demo', ['concat', 'uglify', 'copy:main', 'copy:demo']);
+    grunt.registerTask('demo', ['concat', 'uglify', 'less:demo', 'copy:demo']);
     grunt.registerTask('release', ['clean', 'concat:main', 'uglify:main', 'copy:dist']);
 
 }
