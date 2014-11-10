@@ -1,7 +1,9 @@
-(function (_, undefined) {
-
-    _.rect = function (x, y, width, height, vx, vy, density) {
-        return new _.Rect(x, y, width, height, vx, vy, density);
+/* global CUBE */
+(function (cube, undefined) {
+    'use strict';
+    
+    cube.rect = function (x, y, width, height, vx, vy, density) {
+        return new cube.Rect(x, y, width, height, vx, vy, density);
     };
 
     /**
@@ -17,21 +19,21 @@
      * @param [cy=0] {number} The initial Velocity y.
      * @param [density=1] {number} The density.
      */
-    _.Rect = function (x, y, width, height, vx, vy, density) {
-        _.Vector.call(this, x, y);
+    cube.Rect = function (x, y, width, height, vx, vy, density) {
+        cube.Vector.call(this, x, y);
         this._width = width;
         this._height = height;
-        this._velocity = _.vector(vx || 0, vy || 0);
-        this._box = _.box(x, y, width, height);
+        this._velocity = cube.vector(vx || 0, vy || 0);
+        this._box = cube.box(x, y, width, height);
         this._density = density || 1;
         this._area = undefined;
         this._volume = undefined;
         this._mass = undefined;
     };
-    _.Rect.prototype = Object.create(_.Vector.prototype);
-    _.Rect.constructor = _.Vector;
+    cube.Rect.prototype = Object.create(cube.Vector.prototype);
+    cube.Rect.constructor = cube.Vector;
 
-    _.Rect.prototype = {
+    cube.Rect.prototype = {
         set x(value) {
             if (this._x !== value) {
                 this._x = value;
@@ -108,15 +110,15 @@
         }
     };
 
-    _.Rect.prototype.clone = function () {
-        var rect = _.rect(this.x, this.y, this.width, this.height, this.velocity.x, this.velocity.y, this.density);
+    cube.Rect.prototype.clone = function () {
+        var rect = cube.rect(this.x, this.y, this.width, this.height, this.velocity.x, this.velocity.y, this.density);
         rect._area = this._area;
         rect._volume = this._volume;
         rect._mass = this._mass;
         return rect;
     };
 
-    _.Rect.prototype.scale = function (scalar, clone) {
+    cube.Rect.prototype.scale = function (scalar, clone) {
         var rect = clone ? this.clone() : this;
         this.width *= scalar;
         rect.height *= scalar;

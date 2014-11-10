@@ -1,4 +1,4 @@
-var CUBE = require('../../target/cube-0.1.0.js');
+var CUBE = require('../../../target/main/js/cube-0.1.0.js');
 
 function assertBox(test, box, west, east, north, south) {
     var height = south - north;

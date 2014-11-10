@@ -5,6 +5,7 @@
 var CUBE = {};
 
 Object.prototype.observe = function (observer, callback) {
+    'use strict';
     //console.log(['observe',callback]);
     this._observers = this._observers || [];
     this._observers.push({
@@ -14,6 +15,7 @@ Object.prototype.observe = function (observer, callback) {
 };
 
 Object.prototype.notify = function (names) {
+    'use strict';
     //console.log(['notify', names]);
     if (this._observers) {
         for (var i = 0; i < this._observers.length; i++) {
@@ -24,6 +26,7 @@ Object.prototype.notify = function (names) {
 };
 
 CUBE.extend = function (sub, base, override) {
+    'use strict';
 
     //console.log(['extend', sub, base]);
     sub.prototype = Object.create(base.prototype);
@@ -108,13 +111,6 @@ if (typeof exports !== 'undefined') {
         exports = module.exports = CUBE;
     }
     exports.CUBE = CUBE;
-}
-
-// AMD module
-if (typeof define === 'function' && define.amd) {
-    define('CUBE', [], function () {
-        return CUBE;
-    });
 }
 
 // browser

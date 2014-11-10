@@ -1,4 +1,6 @@
-(function (_, undefined) {
+/* global CUBE */
+(function (cube, undefined) {
+    'use strict';
 
     /**
      * Create a new vector
@@ -9,8 +11,8 @@
      * @param y {number} y coordinate.
      * @returns {vector} The vector
      */
-    _.vector = function (x, y) {
-        return new _.Vector(x, y);
+    cube.vector = function (x, y) {
+        return new cube.Vector(x, y);
     };
 
     /**
@@ -19,14 +21,14 @@
      * @param x {number} x coordinate.
      * @param y {number} y coordinate.
      */
-    _.Vector = function (x, y) {
+    cube.Vector = function (x, y) {
         this._x = x;
         this._y = y;
         this._magnitude = undefined;
         this._normal = undefined;
     };
 
-    _.Vector.prototype = {
+    cube.Vector.prototype = {
         /**
          * The x coordinate
          * @property x
@@ -89,8 +91,8 @@
      * @method clone
      * @returns {vector} A cloned vector
      */
-    _.Vector.prototype.clone = function () {
-        var obj = _.vector(this.x, this.y);
+    cube.Vector.prototype.clone = function () {
+        var obj = cube.vector(this.x, this.y);
         obj._magnitude = this._magnitude;
         obj._normal = this._normal ? this._normal.clone() : undefined;
         return obj;
@@ -103,7 +105,7 @@
      * @param [clone=false] {boolean}
      * @returns {vector}
      */
-    _.Vector.prototype.negate = function (clone) {
+    cube.Vector.prototype.negate = function (clone) {
         var obj = clone ? this.clone() : this;
         obj.x = -obj.x;
         obj.y = -obj.y;
@@ -118,7 +120,7 @@
      * @param [clone=false] {boolean}
      * @returns {vector}
      */
-    _.Vector.prototype.add = function (vector, clone) {
+    cube.Vector.prototype.add = function (vector, clone) {
         var obj = clone ? this.clone() : this;
         obj.x += vector.x;
         obj.y += vector.y;
@@ -133,7 +135,7 @@
      * @param [clone=false] {boolean}
      * @returns {vector}
      */
-    _.Vector.prototype.subtract = function (vector, clone) {
+    cube.Vector.prototype.subtract = function (vector, clone) {
         var obj = clone ? this.clone() : this;
         obj.x -= vector.x;
         obj.y -= vector.y;
@@ -148,7 +150,7 @@
      * @param [clone=false] {boolean}
      * @returns {vector}
      */
-    _.Vector.prototype.scale = function (factor, clone) {
+    cube.Vector.prototype.scale = function (factor, clone) {
         var obj = clone ? this.clone() : this;
         obj.x *= factor;
         obj.y *= factor;
@@ -163,7 +165,7 @@
      * @param [clone=false] {boolean}
      * @returns {vector}
      */
-    _.Vector.prototype.multiply = function (factor, clone) {
+    cube.Vector.prototype.multiply = function (factor, clone) {
         var obj = clone ? this.clone() : this;
         obj.x *= factor;
         obj.y *= factor;
@@ -178,7 +180,7 @@
      * @param [clone=false] {boolean}
      * @returns {vector}
      */
-    _.Vector.prototype.divide = function (factor, clone) {
+    cube.Vector.prototype.divide = function (factor, clone) {
         var obj = clone ? this.clone() : this;
         obj.x /= factor;
         obj.y /= factor;
@@ -192,7 +194,7 @@
      * @param vector {vector}
      * @returns {vector}
      */
-    _.Vector.prototype.dot = function (vector) {
+    cube.Vector.prototype.dot = function (vector) {
         return (this.x * vector.x) + (this.y * vector.y);
     };
 
@@ -203,7 +205,7 @@
      * @param vector {vector}
      * @returns {vector}
      */
-    _.Vector.prototype.cross = function (vector) {
+    cube.Vector.prototype.cross = function (vector) {
         return (this.x * vector.y) - (this.y * vector.x);
     };
 

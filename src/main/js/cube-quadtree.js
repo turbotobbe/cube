@@ -1,17 +1,14 @@
-/**
- * The QuadTree class
- *
- * @class QuadTree
- */
-(function (_, undefined) {
+/* global CUBE */
+(function (cube, undefined) {
+    'use strict';
 
-    _.QuadTree = function (bounds, level) {
+    cube.QuadTree = function (bounds, level) {
         this.bounds = bounds;
         this.level = level || 0;
         this.objs = [];
     };
 
-    _.QuadTree.prototype = {
+    cube.QuadTree.prototype = {
 
         get next() {
             if (this._next === undefined) {
@@ -19,21 +16,15 @@
             }
             return this._next;
         },
-        set next(value) {
-            throw "Illegal Assignment";
-        },
 
         get nw() {
             if (this._nw === undefined) {
                 var bounds = this.next.clone();
                 bounds.x -= bounds.width / 2;
                 bounds.y -= bounds.height / 2;
-                this._nw = new _.QuadTree(bounds, this.level + 1);
+                this._nw = new cube.QuadTree(bounds, this.level + 1);
             }
             return this._nw;
-        },
-        set nw(value) {
-            throw "Illegal Assignment";
         },
 
         get ne() {
@@ -41,12 +32,9 @@
                 var bounds = this.next.clone();
                 bounds.x += bounds.width / 2;
                 bounds.y -= bounds.height / 2;
-                this._ne = new _.QuadTree(bounds, this.level + 1);
+                this._ne = new cube.QuadTree(bounds, this.level + 1);
             }
             return this._ne;
-        },
-        set ne(value) {
-            throw "Illegal Assignment";
         },
 
         get se() {
@@ -54,12 +42,9 @@
                 var bounds = this.next.clone();
                 bounds.x += bounds.width / 2;
                 bounds.y += bounds.height / 2;
-                this._se = new _.QuadTree(bounds, this.level + 1);
+                this._se = new cube.QuadTree(bounds, this.level + 1);
             }
             return this._se;
-        },
-        set se(value) {
-            throw "Illegal Assignment";
         },
 
         get sw() {
@@ -67,12 +52,9 @@
                 var bounds = this.next.clone();
                 bounds.x -= bounds.width / 2;
                 bounds.y += bounds.height / 2;
-                this._sw = new _.QuadTree(bounds, this.level + 1);
+                this._sw = new cube.QuadTree(bounds, this.level + 1);
             }
             return this._sw;
-        },
-        set sw(value) {
-            throw "Illegal Assignment";
         },
 
         clear: function () {
@@ -80,10 +62,18 @@
             while (stack.length > 0) {
                 var quad = stack.pop();
                 quad.objs = [];
-                if (quad._nw) stack.push(quad._nw);
-                if (quad._ne) stack.push(quad._ne);
-                if (quad._sw) stack.push(quad._sw);
-                if (quad._se) stack.push(quad._se);
+                if (quad._nw) {
+                    stack.push(quad._nw);
+                }
+                if (quad._ne) {
+                    stack.push(quad._ne);
+                }
+                if (quad._sw) {
+                    stack.push(quad._sw);
+                }
+                if (quad._se) {
+                    stack.push(quad._se);
+                }
             }
             return this;
         },
@@ -128,10 +118,18 @@
                             rects.push(quad.rects[i]);
                         }
                     }
-                    if (quad._nw) stack.push(quad._nw);
-                    if (quad._ne) stack.push(quad._ne);
-                    if (quad._sw) stack.push(quad._sw);
-                    if (quad._se) stack.push(quad._se);
+                    if (quad._nw) {
+                        stack.push(quad._nw);
+                    }
+                    if (quad._ne) {
+                        stack.push(quad._ne);
+                    }
+                    if (quad._sw) {
+                        stack.push(quad._sw);
+                    }
+                    if (quad._se) {
+                        stack.push(quad._se);
+                    }
                 }
             }
             return rects;

@@ -1,4 +1,4 @@
-var CUBE = require('../../target/cube-0.1.0.js');
+var CUBE = require('../../../target/main/js/cube-0.1.0.js');
 
 function assertProp(test, obj, ref) {
     for (var key in ref) {

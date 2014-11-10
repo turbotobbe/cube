@@ -1,4 +1,6 @@
-(function (_, undefined) {
+/* global CUBE */
+(function (cube, undefined) {
+    'use strict';
 
     /**
      * Create a new box
@@ -11,8 +13,8 @@
      * @param height (number} the height;
      * @returns {box} The box
      */
-    _.box = function (x, y, width, height) {
-        return new _.Box(x, y, width, height);
+    cube.box = function (x, y, width, height) {
+        return new cube.Box(x, y, width, height);
     };
 
     /**
@@ -23,7 +25,7 @@
      * @param width {number}
      * @param height {number}
      */
-    _.Box = function (x, y, width, height) {
+    cube.Box = function (x, y, width, height) {
         this._x = x;
         this._y = y;
         this._width = width;
@@ -32,7 +34,7 @@
         this._south = this._y + this._height;
     };
 
-    _.Box.prototype = {
+    cube.Box.prototype = {
 
         /**
          * When set, the box is moved
@@ -136,8 +138,8 @@
      * @method clone
      * @returns {box} A cloned box
      */
-    _.Box.prototype.clone = function () {
-        return _.box(this.x, this.y, this.width, this.height);
+    cube.Box.prototype.clone = function () {
+        return cube.box(this.x, this.y, this.width, this.height);
     };
 
     /**
@@ -146,7 +148,7 @@
      * @param {box} box
      * @returns {booolean} true if this box covers the box, false otherwise
      */
-    _.Box.prototype.covers = function (box) {
+    cube.Box.prototype.covers = function (box) {
         if (this.west > box.west) {
             return false;
         } else if (this.east < box.east) {
@@ -165,7 +167,7 @@
      * @param {box} box
      * @returns {boolean} true if this box intersects with the box, false otherwise
      */
-    _.Box.prototype.intersects = function (box) {
+    cube.Box.prototype.intersects = function (box) {
         if (this.west > box.east) {
             return false;
         } else if (this.east < box.west) {

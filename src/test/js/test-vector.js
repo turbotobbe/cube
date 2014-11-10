@@ -1,4 +1,5 @@
-var CUBE = require('../../target/cube-0.1.0.js');
+var CUBE = require('../../../target/main/js/cube-0.1.0.js');
+
 module.exports = {
     clone: function (test) {
         var v1 = CUBE.vector(1, 2);

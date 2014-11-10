@@ -1,25 +1,21 @@
-/**
- * Some handy methods
- *
- * @class Util
- */
+/* global CUBE */
+(function (cube, undefined) {
+    'use strict';
 
-(function (_, undefined) {
-
-    _.X = 'x';
-    _.Y = 'y';
-    _.WEST = 'west';
-    _.EAST = 'east';
-    _.NORTH = 'north';
-    _.SOUTH = 'south';
-    _.WIDTH = "width";
-    _.HEIGHT = "height";
-    _.RADIUS = "radius";
-    _.VELOCITY = "velocity";
-    _.DENSITY = "density";
-    _.AREA = "area";
-    _.VOLUME = "volume";
-    _.MASS = "mass";
+    cube.X = 'x';
+    cube.Y = 'y';
+    cube.WEST = 'west';
+    cube.EAST = 'east';
+    cube.NORTH = 'north';
+    cube.SOUTH = 'south';
+    cube.WIDTH = 'width';
+    cube.HEIGHT = 'height';
+    cube.RADIUS = 'radius';
+    cube.VELOCITY = 'velocity';
+    cube.DENSITY = 'density';
+    cube.AREA = 'area';
+    cube.VOLUME = 'volume';
+    cube.MASS = 'mass';
 
     /**
      * Generates a random number between min and max.
@@ -29,28 +25,28 @@
      * @param max {number} Max value
      * @returns {number} The random number
      */
-    _.rand = function (min, max) {
+    cube.rand = function (min, max) {
         return min + (Math.random() * (max - min));
     };
 
-    _.superGet = function (propName) {
+    cube.superGet = function (propName) {
         var desc = Object.getOwnPropertyDescriptor(arguments.callee()._super.prototype, propName);
         return desc.get.call(this);
     };
 
-    _.superSet = function (propName) {
+    cube.superSet = function (propName) {
         var desc = Object.getOwnPropertyDescriptor(arguments.callee()._super.prototype, propName);
         return desc.set.call(this);
     };
 
-    _.superCall = function (propName) {
-        var desc = Object.getOwnPropertyDescriptor(arguments.callee()._super.prototype, propName);
-        console.log(arguments);
+    cube.superCall = function (propName) {
+        //var desc = Object.getOwnPropertyDescriptor(arguments.callee()._super.prototype, propName);
+        console.log([propName, arguments]);
 //    return desc.value.call(arguments.callee(), arguments.slice(1));
         return 'yalla';
     };
 
-    _.observe = function (subject, fn) {
+    cube.observe = function (subject, fn) {
         console.log(['observe', subject, fn]);
         /*
          subject._observers = subject._observers || [];
@@ -61,7 +57,7 @@
          */
     };
 
-    _.notify = function (subject, name) {
+    cube.notify = function (subject, name) {
         if (subject._observers) {
             for (var i = 0; i < subject._observers.length; i++) {
                 var observer = subject._observers[i];
